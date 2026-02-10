@@ -1,0 +1,2219 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KaigoIDE - UI Mockup</title>
+  <style>
+    /* ============================================
+       KaigoIDE UI Mockup - Full Application
+       ============================================ */
+    :root {
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
+      --primary-dark: #1d4ed8;
+      --primary-bg: #eff6ff;
+      --accent: #0891b2;
+      --success: #10b981;
+      --success-bg: #ecfdf5;
+      --warning: #f59e0b;
+      --warning-bg: #fffbeb;
+      --danger: #ef4444;
+      --danger-bg: #fef2f2;
+      --bg: #f1f5f9;
+      --bg-white: #ffffff;
+      --text: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border: #e2e8f0;
+      --border-light: #f1f5f9;
+      --sidebar-bg: #1e293b;
+      --sidebar-text: #cbd5e1;
+      --sidebar-active: #3b82f6;
+      --header-height: 56px;
+      --sidebar-width: 240px;
+      --statusbar-height: 28px;
+      --tab-height: 40px;
+      --radius: 8px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', 'Meiryo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 14px;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    /* ---- Login Screen ---- */
+    .login-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 50%, #0891b2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.4s, transform 0.4s;
+    }
+    .login-screen.hidden { opacity: 0; pointer-events: none; transform: scale(1.02); }
+    .login-card {
+      background: white;
+      border-radius: 16px;
+      padding: 48px 40px;
+      width: 420px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+    }
+    .login-logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .login-logo .logo-icon {
+      width: 64px; height: 64px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .login-logo h1 { font-size: 24px; font-weight: 700; color: var(--text); }
+    .login-logo p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .form-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      width: 100%;
+      padding: 12px;
+    }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--border-light); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover { background: #059669; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-sm { padding: 6px 12px; font-size: 13px; }
+    .btn-icon {
+      width: 36px; height: 36px;
+      padding: 0;
+      border-radius: var(--radius);
+      background: transparent;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      transition: all 0.15s;
+    }
+    .btn-icon:hover { background: var(--bg); }
+    .google-btn {
+      width: 100%;
+      padding: 12px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 12px;
+      transition: background 0.2s;
+    }
+    .google-btn:hover { background: var(--bg); }
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 20px 0;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .divider span { padding: 0 12px; }
+
+    /* ---- App Shell ---- */
+    .app-shell {
+      display: grid;
+      grid-template-rows: var(--header-height) var(--tab-height) 1fr var(--statusbar-height);
+      grid-template-columns: var(--sidebar-width) 1fr;
+      grid-template-areas:
+        "header header"
+        "sidebar tabs"
+        "sidebar main"
+        "statusbar statusbar";
+      height: 100vh;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .app-shell.visible { opacity: 1; }
+
+    /* ---- Header ---- */
+    .header {
+      grid-area: header;
+      background: var(--sidebar-bg);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 16px;
+      z-index: 50;
+    }
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: calc(var(--sidebar-width) - 32px);
+    }
+    .header-logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 14px;
+    }
+    .header-logo-text { color: white; font-weight: 700; font-size: 16px; }
+    .header-search {
+      flex: 1;
+      max-width: 480px;
+      position: relative;
+    }
+    .header-search input {
+      width: 100%;
+      padding: 7px 14px 7px 36px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 6px;
+      color: white;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .header-search input::placeholder { color: rgba(255,255,255,0.4); }
+    .header-search input:focus {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.3);
+    }
+    .header-search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.4);
+      font-size: 14px;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+    .header-btn {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: all 0.15s;
+      position: relative;
+    }
+    .header-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+    .header-btn .badge {
+      position: absolute;
+      top: 4px; right: 4px;
+      width: 8px; height: 8px;
+      background: var(--danger);
+      border-radius: 50%;
+    }
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .header-user:hover { background: rgba(255,255,255,0.1); }
+    .avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .header-user-name { color: rgba(255,255,255,0.9); font-size: 13px; font-weight: 500; }
+
+    /* ---- Sidebar ---- */
+    .sidebar {
+      grid-area: sidebar;
+      background: var(--sidebar-bg);
+      border-right: 1px solid rgba(255,255,255,0.08);
+      overflow-y: auto;
+      padding-top: 8px;
+    }
+    .sidebar-section { padding: 8px 0; }
+    .sidebar-section-title {
+      padding: 6px 20px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.35);
+    }
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 20px;
+      color: var(--sidebar-text);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 13px;
+      border-left: 3px solid transparent;
+    }
+    .sidebar-item:hover { background: rgba(255,255,255,0.05); color: white; }
+    .sidebar-item.active {
+      background: rgba(59,130,246,0.15);
+      color: white;
+      border-left-color: var(--sidebar-active);
+    }
+    .sidebar-item .icon { width: 20px; text-align: center; font-size: 15px; }
+    .sidebar-item .badge-count {
+      margin-left: auto;
+      background: rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.7);
+      font-size: 11px;
+      padding: 1px 7px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+    .sidebar-item .badge-alert {
+      margin-left: auto;
+      background: var(--danger);
+      color: white;
+      font-size: 11px;
+      padding: 1px 7px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    /* ---- Tabs ---- */
+    .tab-bar {
+      grid-area: tabs;
+      background: var(--bg);
+      display: flex;
+      align-items: flex-end;
+      padding: 0 8px;
+      gap: 1px;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    .tab {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: transparent;
+      border: none;
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .tab:hover { color: var(--text-secondary); background: rgba(0,0,0,0.03); }
+    .tab.active {
+      color: var(--primary);
+      background: var(--bg-white);
+      border-bottom-color: var(--primary);
+      font-weight: 600;
+    }
+    .tab .tab-close {
+      width: 16px; height: 16px;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--text-muted);
+      opacity: 0;
+      transition: all 0.15s;
+    }
+    .tab:hover .tab-close { opacity: 1; }
+    .tab .tab-close:hover { background: rgba(0,0,0,0.1); color: var(--text); }
+
+    /* ---- Main Content ---- */
+    .main {
+      grid-area: main;
+      overflow-y: auto;
+      background: var(--bg);
+    }
+    .page { display: none; height: 100%; }
+    .page.active { display: block; }
+    .page-header {
+      padding: 20px 24px 16px;
+      background: var(--bg-white);
+      border-bottom: 1px solid var(--border);
+    }
+    .page-header h2 { font-size: 20px; font-weight: 700; }
+    .page-header p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+    .page-header-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .page-body { padding: 20px 24px; }
+
+    /* ---- Status Bar ---- */
+    .statusbar {
+      grid-area: statusbar;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.85);
+      gap: 16px;
+    }
+    .statusbar-right { margin-left: auto; display: flex; gap: 16px; }
+    .statusbar-item { display: flex; align-items: center; gap: 4px; }
+    .statusbar-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+    }
+
+    /* ---- Cards ---- */
+    .card {
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+    }
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-header h3 { font-size: 15px; font-weight: 600; }
+    .card-body { padding: 20px; }
+
+    /* ---- Dashboard ---- */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .stat-card .stat-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+    .stat-card .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .stat-card .stat-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .stat-card .stat-change {
+      font-size: 12px;
+      margin-top: 8px;
+      font-weight: 600;
+    }
+    .dashboard-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    /* ---- Tables ---- */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .data-table th {
+      text-align: left;
+      padding: 10px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .data-table td {
+      padding: 12px 16px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .data-table tr:hover td { background: rgba(59,130,246,0.03); }
+    .data-table tr { cursor: pointer; }
+
+    /* ---- Badges / Tags ---- */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .tag-blue { background: var(--primary-bg); color: var(--primary); }
+    .tag-green { background: var(--success-bg); color: var(--success); }
+    .tag-yellow { background: var(--warning-bg); color: var(--warning); }
+    .tag-red { background: var(--danger-bg); color: var(--danger); }
+    .tag-gray { background: var(--bg); color: var(--text-muted); }
+
+    /* ---- Timeline ---- */
+    .timeline { position: relative; padding-left: 24px; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+    .timeline-item {
+      position: relative;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: box-shadow 0.15s;
+    }
+    .timeline-item:hover { box-shadow: var(--shadow-md); }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -21px;
+      top: 18px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 2px solid var(--bg-white);
+    }
+    .timeline-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .timeline-content { font-size: 13px; line-height: 1.7; }
+
+    /* ---- Form Layout ---- */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-grid .full-width { grid-column: 1 / -1; }
+    .form-group { margin-bottom: 0; }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      font-family: inherit;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    .form-textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+    .form-select { appearance: auto; cursor: pointer; }
+    .form-hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    .form-row { display: flex; gap: 12px; align-items: flex-end; }
+    .form-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      margin-top: 20px;
+    }
+    .radio-group { display: flex; gap: 16px; flex-wrap: wrap; }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 400;
+      cursor: pointer;
+    }
+
+    /* ---- Filter bar ---- */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      background: var(--bg-white);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .filter-bar .form-input,
+    .filter-bar .form-select {
+      width: auto;
+      min-width: 150px;
+      padding: 7px 10px;
+      font-size: 13px;
+    }
+
+    /* ---- Conference Form ---- */
+    .attendee-list { display: flex; flex-direction: column; gap: 8px; }
+    .attendee-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--bg);
+      border-radius: 6px;
+      font-size: 13px;
+    }
+    .attendee-row .check { color: var(--success); }
+    .attendee-row .absent { color: var(--warning); font-style: italic; }
+    .agenda-list { display: flex; flex-direction: column; gap: 12px; }
+    .agenda-item {
+      padding: 14px;
+      background: var(--bg);
+      border-radius: 6px;
+      border-left: 3px solid var(--primary);
+    }
+    .agenda-item .agenda-num {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    .agenda-item .agenda-topic {
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    /* ---- Alerts ---- */
+    .alert-list { display: flex; flex-direction: column; gap: 8px; }
+    .alert-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+    .alert-item.alert-warning { background: var(--warning-bg); }
+    .alert-item.alert-danger { background: var(--danger-bg); }
+    .alert-item.alert-info { background: var(--primary-bg); }
+    .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ---- Care Plan Table ---- */
+    .plan-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .plan-status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+    .plan-status-dot.active { background: var(--success); }
+    .plan-status-dot.draft { background: var(--warning); }
+    .plan-status-dot.archived { background: var(--text-muted); }
+
+    /* ---- Settings ---- */
+    .settings-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 0;
+      height: 100%;
+    }
+    .settings-nav {
+      background: var(--bg-white);
+      border-right: 1px solid var(--border);
+      padding: 16px 0;
+    }
+    .settings-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .settings-nav-item:hover { background: var(--bg); }
+    .settings-nav-item.active {
+      background: var(--primary-bg);
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .settings-content { padding: 24px; overflow-y: auto; }
+
+    /* ---- PDF Preview ---- */
+    .pdf-preview {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px;
+      max-width: 800px;
+      margin: 0 auto;
+      box-shadow: var(--shadow-md);
+      font-size: 13px;
+    }
+    .pdf-preview h4 {
+      text-align: center;
+      font-size: 16px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #333;
+      padding-bottom: 8px;
+    }
+    .pdf-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+    }
+    .pdf-table th, .pdf-table td {
+      border: 1px solid #333;
+      padding: 6px 10px;
+      font-size: 12px;
+      text-align: left;
+    }
+    .pdf-table th {
+      background: #f0f0f0;
+      font-weight: 600;
+      font-size: 11px;
+    }
+
+    /* ---- Quick Input Panel ---- */
+    .quick-panel {
+      position: fixed;
+      bottom: var(--statusbar-height);
+      right: 0;
+      width: 440px;
+      background: white;
+      border-left: 1px solid var(--border);
+      border-top: 1px solid var(--border);
+      box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+      z-index: 40;
+      display: none;
+      flex-direction: column;
+      max-height: calc(100vh - var(--header-height) - var(--statusbar-height));
+    }
+    .quick-panel.open { display: flex; }
+    .quick-panel-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--primary-bg);
+    }
+    .quick-panel-header h3 { font-size: 14px; color: var(--primary); }
+    .quick-panel-body { padding: 16px; overflow-y: auto; flex: 1; }
+
+    /* ---- Scrollbar ---- */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
+
+    /* ---- Responsive hint ---- */
+    .responsive-indicator {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 32px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: var(--shadow-md);
+      z-index: 99999;
+    }
+    @media (max-width: 900px) {
+      .responsive-indicator { display: block; }
+      .app-shell { display: none; }
+    }
+
+    /* ---- Empty state ---- */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+    }
+    .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-state p { font-size: 14px; }
+
+    /* ---- Google Calendar sync icon ---- */
+    .gcal-icon {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* ---- Overlay for modals ---- */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .overlay.open { display: flex; }
+    .modal {
+      background: white;
+      border-radius: 12px;
+      width: 560px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+    }
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-header h3 { font-size: 16px; font-weight: 700; }
+    .modal-body { padding: 24px; }
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ==========================================
+     LOGIN SCREEN
+     ========================================== -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">K</div>
+      <h1>KaigoIDE</h1>
+      <p>居宅介護支援事業所向け 総合業務支援システム</p>
+    </div>
+    <div class="form-group">
+      <label>メールアドレス</label>
+      <input type="email" class="form-input" placeholder="example@kaigo.jp" value="tanaka@sakura-care.jp">
+    </div>
+    <div class="form-group">
+      <label>パスワード</label>
+      <input type="password" class="form-input" placeholder="********" value="password">
+    </div>
+    <button class="btn btn-primary" onclick="doLogin()">ログイン</button>
+    <div class="divider"><span>または</span></div>
+    <button class="google-btn" onclick="doLogin()">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Googleアカウントでログイン
+    </button>
+  </div>
+</div>
+
+<!-- ==========================================
+     APP SHELL
+     ========================================== -->
+<div class="app-shell" id="appShell">
+
+  <!-- ---- Header ---- -->
+  <header class="header">
+    <div class="header-logo">
+      <div class="header-logo-icon">K</div>
+      <span class="header-logo-text">KaigoIDE</span>
+    </div>
+    <div class="header-search">
+      <span class="header-search-icon">&#128269;</span>
+      <input type="text" placeholder="利用者名・記録内容を検索... (Ctrl+K)">
+    </div>
+    <div class="header-actions">
+      <button class="header-btn" title="クイック入力" onclick="toggleQuickPanel()">&#9999;</button>
+      <button class="header-btn" title="Googleカレンダー同期">&#128197;</button>
+      <button class="header-btn" title="通知"><span class="badge"></span>&#128276;</button>
+      <div class="header-user">
+        <div class="avatar">田</div>
+        <span class="header-user-name">田中 美咲</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ---- Sidebar ---- -->
+  <nav class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">メイン</div>
+      <div class="sidebar-item active" onclick="showPage('dashboard')">
+        <span class="icon">&#127968;</span>ダッシュボード
+      </div>
+      <div class="sidebar-item" onclick="showPage('clients')">
+        <span class="icon">&#128101;</span>利用者一覧
+        <span class="badge-count">35</span>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">記録・帳票</div>
+      <div class="sidebar-item" onclick="showPage('care-records')">
+        <span class="icon">&#128221;</span>支援経過記録（第5表）
+      </div>
+      <div class="sidebar-item" onclick="showPage('conferences')">
+        <span class="icon">&#128483;</span>担当者会議（第4表）
+      </div>
+      <div class="sidebar-item" onclick="showPage('care-plans')">
+        <span class="icon">&#128203;</span>ケアプラン管理
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">マスタ</div>
+      <div class="sidebar-item" onclick="showPage('providers')">
+        <span class="icon">&#127973;</span>事業所マスタ
+      </div>
+      <div class="sidebar-item" onclick="showPage('templates')">
+        <span class="icon">&#128196;</span>テンプレート
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">システム</div>
+      <div class="sidebar-item" onclick="showPage('settings')">
+        <span class="icon">&#9881;</span>設定
+      </div>
+    </div>
+    <div class="sidebar-section" style="border-top: 1px solid rgba(255,255,255,0.08); margin-top: 8px; padding-top: 12px;">
+      <div class="sidebar-item" style="color: rgba(255,255,255,0.35); font-size: 12px;">
+        <span class="icon">&#128196;</span>
+        <span>v0.1.0 MVP (Phase 1)</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ---- Tab Bar ---- -->
+  <div class="tab-bar" id="tabBar">
+    <button class="tab active" data-page="dashboard" onclick="showPage('dashboard')">
+      &#127968; ダッシュボード
+    </button>
+  </div>
+
+  <!-- ---- Main Content ---- -->
+  <main class="main" id="mainContent">
+
+    <!-- ======== DASHBOARD ======== -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <h2>ダッシュボード</h2>
+        <p>おはようございます、田中さん。今日の予定と最新の状況をお知らせします。</p>
+      </div>
+      <div class="page-body">
+        <div class="dashboard-grid">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:var(--primary-bg); color:var(--primary);">&#128101;</div>
+            <div class="stat-value">35</div>
+            <div class="stat-label">担当利用者数</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:var(--success-bg); color:var(--success);">&#128221;</div>
+            <div class="stat-value">12</div>
+            <div class="stat-label">今月の記録件数</div>
+            <div class="stat-change" style="color:var(--success);">+3 今週</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#faf5ff; color:#8b5cf6;">&#128483;</div>
+            <div class="stat-value">3</div>
+            <div class="stat-label">今月の会議予定</div>
+            <div class="stat-change" style="color:var(--warning);">次回: 2/8</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:var(--warning-bg); color:var(--warning);">&#9888;</div>
+            <div class="stat-value">2</div>
+            <div class="stat-label">要対応アラート</div>
+            <div class="stat-change" style="color:var(--danger);">認定期限切れ</div>
+          </div>
+        </div>
+
+        <div class="dashboard-cols">
+          <!-- Today's Schedule -->
+          <div class="card">
+            <div class="card-header">
+              <h3>&#128197; 今日の予定</h3>
+              <span class="gcal-icon">&#128197; Googleカレンダー連携中</span>
+            </div>
+            <div class="card-body" style="padding: 12px 16px;">
+              <div style="display:flex; gap:12px; align-items:flex-start; padding:8px 0; border-bottom:1px solid var(--border-light);">
+                <div style="font-size:12px; color:var(--primary); font-weight:700; min-width:50px;">09:00</div>
+                <div>
+                  <div style="font-weight:600; font-size:13px;">山田太郎様 自宅訪問</div>
+                  <div style="font-size:12px; color:var(--text-muted);">月次モニタリング</div>
+                </div>
+                <span class="tag tag-blue" style="margin-left:auto; font-size:11px;">訪問</span>
+              </div>
+              <div style="display:flex; gap:12px; align-items:flex-start; padding:8px 0; border-bottom:1px solid var(--border-light);">
+                <div style="font-size:12px; color:var(--primary); font-weight:700; min-width:50px;">11:00</div>
+                <div>
+                  <div style="font-weight:600; font-size:13px;">佐藤花子様 電話連絡</div>
+                  <div style="font-size:12px; color:var(--text-muted);">デイサービス利用確認</div>
+                </div>
+                <span class="tag tag-green" style="margin-left:auto; font-size:11px;">電話</span>
+              </div>
+              <div style="display:flex; gap:12px; align-items:flex-start; padding:8px 0; border-bottom:1px solid var(--border-light);">
+                <div style="font-size:12px; color:#8b5cf6; font-weight:700; min-width:50px;">14:00</div>
+                <div>
+                  <div style="font-weight:600; font-size:13px;">鈴木一郎様 担当者会議</div>
+                  <div style="font-size:12px; color:var(--text-muted);">更新認定 / 利用者自宅</div>
+                </div>
+                <span class="tag tag-yellow" style="margin-left:auto; font-size:11px;">会議</span>
+              </div>
+              <div style="display:flex; gap:12px; align-items:flex-start; padding:8px 0;">
+                <div style="font-size:12px; color:var(--primary); font-weight:700; min-width:50px;">16:00</div>
+                <div>
+                  <div style="font-weight:600; font-size:13px;">高橋幸子様 自宅訪問</div>
+                  <div style="font-size:12px; color:var(--text-muted);">新規ケアプラン説明</div>
+                </div>
+                <span class="tag tag-blue" style="margin-left:auto; font-size:11px;">訪問</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alerts -->
+          <div class="card">
+            <div class="card-header">
+              <h3>&#9888; アラート・お知らせ</h3>
+            </div>
+            <div class="card-body">
+              <div class="alert-list">
+                <div class="alert-item alert-danger">
+                  <span class="alert-icon">&#128308;</span>
+                  <div>
+                    <strong>認定有効期限切れ間近</strong>
+                    <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">山田太郎様 - 2026/02/28 まで（残り23日）</div>
+                  </div>
+                </div>
+                <div class="alert-item alert-danger">
+                  <span class="alert-icon">&#128308;</span>
+                  <div>
+                    <strong>認定有効期限切れ間近</strong>
+                    <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">佐藤花子様 - 2026/03/15 まで（残り38日）</div>
+                  </div>
+                </div>
+                <div class="alert-item alert-warning">
+                  <span class="alert-icon">&#128992;</span>
+                  <div>
+                    <strong>担当者会議 未記録</strong>
+                    <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">鈴木一郎様 - 1/25開催分の記録が未入力です</div>
+                  </div>
+                </div>
+                <div class="alert-item alert-info">
+                  <span class="alert-icon">&#128309;</span>
+                  <div>
+                    <strong>Googleカレンダー同期完了</strong>
+                    <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">最終同期: 今日 08:45 - 全データ正常</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Records -->
+        <div class="card" style="margin-top: 20px;">
+          <div class="card-header">
+            <h3>&#128221; 最近の支援経過記録</h3>
+            <button class="btn btn-secondary btn-sm" onclick="showPage('care-records')">すべて表示</button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>日時</th>
+                <th>利用者</th>
+                <th>区分</th>
+                <th>内容（抜粋）</th>
+                <th>Sync</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="showPage('care-record-detail')">
+                <td>2026/02/04 14:30</td>
+                <td style="font-weight:600;">山田太郎様</td>
+                <td><span class="tag tag-blue">訪問</span></td>
+                <td>自宅訪問。体調良好。血圧128/82。食事量も安定しており...</td>
+                <td><span class="gcal-icon">&#9989;</span></td>
+              </tr>
+              <tr onclick="showPage('care-record-detail')">
+                <td>2026/02/03 10:15</td>
+                <td style="font-weight:600;">佐藤花子様</td>
+                <td><span class="tag tag-green">電話</span></td>
+                <td>デイサービスより連絡。先週の利用状況について報告あり...</td>
+                <td><span class="gcal-icon">&#9989;</span></td>
+              </tr>
+              <tr onclick="showPage('care-record-detail')">
+                <td>2026/02/01 16:00</td>
+                <td style="font-weight:600;">高橋幸子様</td>
+                <td><span class="tag tag-blue">訪問</span></td>
+                <td>新規ケアプラン説明のため訪問。利用者・ご家族ともに同意...</td>
+                <td><span class="gcal-icon">&#9989;</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== CLIENTS LIST ======== -->
+    <div class="page" id="page-clients">
+      <div class="page-header">
+        <h2>利用者一覧</h2>
+        <p>担当利用者 35名</p>
+        <div class="page-header-actions">
+          <button class="btn btn-primary btn-sm" onclick="showPage('client-new')">+ 新規登録</button>
+          <button class="btn btn-secondary btn-sm">CSV出力</button>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <input type="text" class="form-input" placeholder="&#128269; 名前・被保険者番号で検索...">
+        <select class="form-select">
+          <option>全ての要介護度</option>
+          <option>要支援1</option><option>要支援2</option>
+          <option>要介護1</option><option>要介護2</option><option>要介護3</option>
+          <option>要介護4</option><option>要介護5</option>
+        </select>
+        <select class="form-select">
+          <option>ステータス: 全て</option>
+          <option>利用中</option><option>休止中</option>
+        </select>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>利用者名</th>
+            <th>フリガナ</th>
+            <th>年齢</th>
+            <th>要介護度</th>
+            <th>認定期間</th>
+            <th>最終記録日</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr onclick="showPage('client-detail')">
+            <td style="font-weight:600;">山田 太郎</td>
+            <td>ヤマダ タロウ</td>
+            <td>82歳</td>
+            <td><span class="tag tag-blue">要介護2</span></td>
+            <td>2025/03/01 〜 <span style="color:var(--danger); font-weight:600;">2026/02/28</span></td>
+            <td>2026/02/04</td>
+            <td><span style="color:var(--danger); font-size:11px; font-weight:600;">期限間近</span></td>
+          </tr>
+          <tr onclick="showPage('client-detail')">
+            <td style="font-weight:600;">佐藤 花子</td>
+            <td>サトウ ハナコ</td>
+            <td>78歳</td>
+            <td><span class="tag tag-blue">要介護1</span></td>
+            <td>2025/04/01 〜 2026/03/31</td>
+            <td>2026/02/03</td>
+            <td></td>
+          </tr>
+          <tr onclick="showPage('client-detail')">
+            <td style="font-weight:600;">鈴木 一郎</td>
+            <td>スズキ イチロウ</td>
+            <td>85歳</td>
+            <td><span class="tag tag-yellow">要介護3</span></td>
+            <td>2025/06/01 〜 2026/05/31</td>
+            <td>2026/01/28</td>
+            <td></td>
+          </tr>
+          <tr onclick="showPage('client-detail')">
+            <td style="font-weight:600;">高橋 幸子</td>
+            <td>タカハシ サチコ</td>
+            <td>74歳</td>
+            <td><span class="tag tag-green">要支援2</span></td>
+            <td>2025/10/01 〜 2026/09/30</td>
+            <td>2026/02/01</td>
+            <td></td>
+          </tr>
+          <tr onclick="showPage('client-detail')">
+            <td style="font-weight:600;">中村 正</td>
+            <td>ナカムラ タダシ</td>
+            <td>90歳</td>
+            <td><span class="tag tag-red">要介護4</span></td>
+            <td>2025/08/01 〜 2026/07/31</td>
+            <td>2026/01/30</td>
+            <td></td>
+          </tr>
+          <tr onclick="showPage('client-detail')">
+            <td style="font-weight:600;">渡辺 美智子</td>
+            <td>ワタナベ ミチコ</td>
+            <td>80歳</td>
+            <td><span class="tag tag-blue">要介護2</span></td>
+            <td>2025/12/01 〜 2026/11/30</td>
+            <td>2026/01/25</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ======== CLIENT DETAIL ======== -->
+    <div class="page" id="page-client-detail">
+      <div class="page-header">
+        <div style="display:flex; align-items:center; gap:16px;">
+          <div class="avatar" style="width:48px; height:48px; font-size:18px; background:linear-gradient(135deg, #2563eb, #0891b2);">山</div>
+          <div>
+            <h2>山田 太郎 様</h2>
+            <p>82歳 / 要介護2 / 認定期間: 2025/03/01 〜 2026/02/28</p>
+          </div>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-primary btn-sm" onclick="showPage('care-record-new')">&#128221; 記録を追加</button>
+          <button class="btn btn-secondary btn-sm" onclick="showPage('conference-new')">&#128483; 会議を作成</button>
+          <button class="btn btn-secondary btn-sm">&#9998; 基本情報編集</button>
+        </div>
+      </div>
+      <div class="page-body">
+        <!-- Client Info Cards -->
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-bottom:20px;">
+          <div class="card">
+            <div class="card-body" style="padding:16px;">
+              <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">保険者番号 / 被保険者番号</div>
+              <div style="font-weight:600;">131001 / 0001234567</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body" style="padding:16px;">
+              <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">住所</div>
+              <div style="font-weight:600;">東京都新宿区西新宿1-2-3</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body" style="padding:16px;">
+              <div style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">連絡先</div>
+              <div style="font-weight:600;">03-1234-5678</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+          <!-- Care Record Timeline -->
+          <div class="card">
+            <div class="card-header">
+              <h3>&#128221; 支援経過記録（第5表）</h3>
+              <button class="btn btn-secondary btn-sm" onclick="showPage('care-records')">全件表示</button>
+            </div>
+            <div class="card-body">
+              <div class="timeline">
+                <div class="timeline-item" onclick="showPage('care-record-detail')">
+                  <div class="timeline-meta">
+                    <span>2026/02/04 14:30</span>
+                    <span class="tag tag-blue" style="font-size:11px;">訪問</span>
+                  </div>
+                  <div class="timeline-content">自宅訪問。体調良好。血圧128/82。食事量も安定しており、デイサービスの利用も継続的。</div>
+                </div>
+                <div class="timeline-item" onclick="showPage('care-record-detail')">
+                  <div class="timeline-meta">
+                    <span>2026/01/20 11:00</span>
+                    <span class="tag tag-green" style="font-size:11px;">電話</span>
+                  </div>
+                  <div class="timeline-content">訪問介護事業所より連絡。入浴時の見守り強化の必要性について相談あり。</div>
+                </div>
+                <div class="timeline-item" onclick="showPage('care-record-detail')">
+                  <div class="timeline-meta">
+                    <span>2026/01/10 15:00</span>
+                    <span class="tag tag-blue" style="font-size:11px;">訪問</span>
+                  </div>
+                  <div class="timeline-content">月次モニタリング訪問。歩行時のふらつきが若干みられる。福祉用具の検討を提案。</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Conferences & Care Plans -->
+          <div>
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-header">
+                <h3>&#128203; ケアプラン</h3>
+                <button class="btn btn-secondary btn-sm" onclick="showPage('care-plans')">管理</button>
+              </div>
+              <table class="data-table">
+                <thead><tr><th>作成日</th><th>版数</th><th>目的</th><th>状態</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td>2025/09/01</td>
+                    <td>第2版</td>
+                    <td>更新</td>
+                    <td><span class="plan-status"><span class="plan-status-dot active"></span> 有効</span></td>
+                  </tr>
+                  <tr>
+                    <td>2025/03/01</td>
+                    <td>第1版</td>
+                    <td>新規作成</td>
+                    <td><span class="plan-status"><span class="plan-status-dot archived"></span> アーカイブ</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h3>&#128483; 担当者会議（第4表）</h3>
+                <button class="btn btn-secondary btn-sm" onclick="showPage('conferences')">全件表示</button>
+              </div>
+              <table class="data-table">
+                <thead><tr><th>開催日</th><th>目的</th><th>配置日</th><th>PDF</th></tr></thead>
+                <tbody>
+                  <tr onclick="showPage('conference-detail')">
+                    <td>2025/09/05</td>
+                    <td><span class="tag tag-blue">更新</span></td>
+                    <td style="font-size:12px; color:var(--text-muted);">2025/09/01<br>(プラン第2版)</td>
+                    <td><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); showPage('pdf-preview')">PDF</button></td>
+                  </tr>
+                  <tr onclick="showPage('conference-detail')">
+                    <td>2025/03/10</td>
+                    <td><span class="tag tag-green">新規作成</span></td>
+                    <td style="font-size:12px; color:var(--text-muted);">2025/03/01<br>(プラン第1版)</td>
+                    <td><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); showPage('pdf-preview')">PDF</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== CARE RECORDS LIST ======== -->
+    <div class="page" id="page-care-records">
+      <div class="page-header">
+        <h2>&#128221; 支援経過記録（第5表）</h2>
+        <p>Googleカレンダー「KaigoIDE_支援経過記録」と同期中</p>
+        <div class="page-header-actions">
+          <button class="btn btn-primary btn-sm" onclick="showPage('care-record-new')">+ 新規記録</button>
+          <button class="btn btn-secondary btn-sm" onclick="showPage('pdf-preview-5')">&#128196; PDF出力</button>
+          <button class="btn btn-secondary btn-sm">&#128197; カレンダーで表示</button>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <select class="form-select">
+          <option>山田 太郎 様</option>
+          <option>佐藤 花子 様</option>
+          <option>全ての利用者</option>
+        </select>
+        <input type="date" class="form-input" value="2026-01-01" style="width:150px;">
+        <span style="color:var(--text-muted);">〜</span>
+        <input type="date" class="form-input" value="2026-02-05" style="width:150px;">
+        <select class="form-select">
+          <option>全ての区分</option>
+          <option>訪問</option><option>電話</option><option>FAX</option>
+          <option>メール</option><option>会議</option><option>その他</option>
+        </select>
+        <input type="text" class="form-input" placeholder="&#128269; キーワード検索...">
+      </div>
+      <div style="padding:20px 24px;">
+        <div class="timeline">
+          <div class="timeline-item" onclick="showPage('care-record-detail')">
+            <div class="timeline-meta">
+              <span>2026/02/04 14:30</span>
+              <span class="tag tag-blue" style="font-size:11px;">訪問</span>
+              <span class="gcal-icon" style="margin-left:auto;">&#128197; 同期済</span>
+            </div>
+            <div class="timeline-content">
+              <strong>自宅訪問。</strong>体調良好。血圧128/82。食事量も安定しており、デイサービスの利用も継続的に行えている。<br>
+              <span style="color:var(--primary); font-size:12px;">【判断】サービス継続で問題なし。次回モニタリング時に歩行状態を再確認。</span>
+            </div>
+          </div>
+          <div class="timeline-item" onclick="showPage('care-record-detail')">
+            <div class="timeline-meta">
+              <span>2026/02/03 10:15</span>
+              <span class="tag tag-green" style="font-size:11px;">電話</span>
+              <span class="gcal-icon" style="margin-left:auto;">&#128197; 同期済</span>
+            </div>
+            <div class="timeline-content">
+              <strong>デイサービスより連絡。</strong>先週の利用状況について報告あり。レクリエーション活動に積極的に参加。<br>
+              <span style="color:var(--text-muted); font-size:12px;">関係機関: ABCデイサービス</span>
+            </div>
+          </div>
+          <div class="timeline-item" onclick="showPage('care-record-detail')">
+            <div class="timeline-meta">
+              <span>2026/01/20 11:00</span>
+              <span class="tag tag-green" style="font-size:11px;">電話</span>
+              <span class="gcal-icon" style="margin-left:auto;">&#128197; 同期済</span>
+            </div>
+            <div class="timeline-content">
+              <strong>訪問介護事業所より連絡。</strong>入浴時の見守り強化の必要性について相談あり。転倒リスクの増加を報告。<br>
+              <span style="color:var(--primary); font-size:12px;">【判断】次回訪問時に実際の状況を確認。必要に応じてサービス担当者会議を開催。</span>
+            </div>
+          </div>
+          <div class="timeline-item" onclick="showPage('care-record-detail')">
+            <div class="timeline-meta">
+              <span>2026/01/10 15:00</span>
+              <span class="tag tag-blue" style="font-size:11px;">訪問</span>
+              <span class="gcal-icon" style="margin-left:auto;">&#128197; 同期済</span>
+            </div>
+            <div class="timeline-content">
+              <strong>月次モニタリング訪問。</strong>歩行時のふらつきが若干みられる。本人は「大丈夫」とのことだが、長女より心配の声あり。<br>
+              <span style="color:var(--primary); font-size:12px;">【判断】福祉用具（歩行器）の導入を検討。福祉用具事業所に相談予定。</span><br>
+              <span style="color:var(--accent); font-size:12px;">【家族意見】長女「転んでからでは遅い。早めに対策してほしい」</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== CARE RECORD NEW ======== -->
+    <div class="page" id="page-care-record-new">
+      <div class="page-header">
+        <h2>&#128221; 支援経過記録 - 新規作成</h2>
+        <p>Googleカレンダー「KaigoIDE_支援経過記録」に保存されます</p>
+      </div>
+      <div class="page-body">
+        <div class="card">
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>利用者 *</label>
+                <select class="form-select">
+                  <option>山田 太郎 様</option>
+                  <option>佐藤 花子 様</option>
+                  <option>鈴木 一郎 様</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>記録日時 *</label>
+                <input type="datetime-local" class="form-input" value="2026-02-05T10:00">
+              </div>
+              <div class="form-group full-width">
+                <label>区分 *</label>
+                <div class="radio-group">
+                  <label><input type="radio" name="category" checked> 訪問</label>
+                  <label><input type="radio" name="category"> 電話</label>
+                  <label><input type="radio" name="category"> FAX</label>
+                  <label><input type="radio" name="category"> メール</label>
+                  <label><input type="radio" name="category"> 会議</label>
+                  <label><input type="radio" name="category"> その他</label>
+                </div>
+              </div>
+              <div class="form-group full-width">
+                <label>内容 *</label>
+                <div style="display:flex; gap:8px; margin-bottom:8px;">
+                  <button class="btn btn-secondary btn-sm">&#127908; 音声入力</button>
+                  <button class="btn btn-secondary btn-sm">&#128196; テンプレート</button>
+                </div>
+                <textarea class="form-textarea" style="min-height:150px;" placeholder="支援経過の内容を入力してください..."></textarea>
+                <div class="form-hint">最大5,000文字 | Googleカレンダーのイベント本文に保存されます</div>
+              </div>
+              <div class="form-group">
+                <label>関係機関</label>
+                <input type="text" class="form-input" placeholder="例: ABCデイサービス">
+              </div>
+              <div class="form-group">
+                <label>介護支援専門員の判断</label>
+                <textarea class="form-textarea" style="min-height:80px;" placeholder="専門職としての判断を記載..."></textarea>
+              </div>
+              <div class="form-group full-width">
+                <label>利用者・家族の考え</label>
+                <textarea class="form-textarea" style="min-height:60px;" placeholder="利用者またはご家族の意見・要望..."></textarea>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-secondary">下書き保存</button>
+              <button class="btn btn-primary">&#128197; 保存（Googleカレンダーに同期）</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== CONFERENCES LIST ======== -->
+    <div class="page" id="page-conferences">
+      <div class="page-header">
+        <h2>&#128483; 担当者会議（第4表）</h2>
+        <p>Googleカレンダー「KaigoIDE_担当者会議」と同期中 / ケアプラン作成日で配置</p>
+        <div class="page-header-actions">
+          <button class="btn btn-primary btn-sm" onclick="showPage('conference-new')">+ 新規作成</button>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <select class="form-select"><option>全ての利用者</option><option>山田 太郎 様</option></select>
+        <select class="form-select"><option>全ての目的</option><option>新規作成</option><option>変更</option><option>更新</option></select>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>利用者</th>
+            <th>開催日</th>
+            <th>目的</th>
+            <th>紐づくプラン</th>
+            <th>カレンダー配置日</th>
+            <th>出席者数</th>
+            <th>PDF</th>
+            <th>Sync</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr onclick="showPage('conference-detail')">
+            <td style="font-weight:600;">山田 太郎 様</td>
+            <td>2025/09/05</td>
+            <td><span class="tag tag-blue">更新</span></td>
+            <td>第2版 (2025/09/01)</td>
+            <td style="color:var(--primary); font-weight:600;">2025/09/01</td>
+            <td>5名（欠席1名）</td>
+            <td><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); showPage('pdf-preview')">&#128196;</button></td>
+            <td><span class="gcal-icon">&#9989;</span></td>
+          </tr>
+          <tr onclick="showPage('conference-detail')">
+            <td style="font-weight:600;">山田 太郎 様</td>
+            <td>2025/03/10</td>
+            <td><span class="tag tag-green">新規作成</span></td>
+            <td>第1版 (2025/03/01)</td>
+            <td style="color:var(--primary); font-weight:600;">2025/03/01</td>
+            <td>4名</td>
+            <td><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); showPage('pdf-preview')">&#128196;</button></td>
+            <td><span class="gcal-icon">&#9989;</span></td>
+          </tr>
+          <tr onclick="showPage('conference-detail')">
+            <td style="font-weight:600;">鈴木 一郎 様</td>
+            <td>2025/06/15</td>
+            <td><span class="tag tag-yellow">区分変更</span></td>
+            <td>第3版 (2025/06/01)</td>
+            <td style="color:var(--primary); font-weight:600;">2025/06/01</td>
+            <td>6名（欠席2名）</td>
+            <td><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); showPage('pdf-preview')">&#128196;</button></td>
+            <td><span class="gcal-icon">&#9989;</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ======== CONFERENCE NEW ======== -->
+    <div class="page" id="page-conference-new">
+      <div class="page-header">
+        <h2>&#128483; 担当者会議（第4表）- 新規作成</h2>
+        <p>保存するとGoogleカレンダーに紐づくケアプラン作成日で配置されます</p>
+      </div>
+      <div class="page-body">
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header"><h3>基本情報</h3></div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>利用者 *</label>
+                <select class="form-select"><option>山田 太郎 様</option></select>
+              </div>
+              <div class="form-group">
+                <label>紐づくケアプラン *</label>
+                <select class="form-select">
+                  <option>第2版 (2025/09/01) - 更新 [有効]</option>
+                  <option>第1版 (2025/03/01) - 新規作成 [アーカイブ]</option>
+                </select>
+                <div class="form-hint">&#9888; カレンダー上ではこのプランの作成日(2025/09/01)にイベントが配置されます</div>
+              </div>
+              <div class="form-group">
+                <label>会議開催日 *</label>
+                <input type="date" class="form-input" value="2026-02-08">
+              </div>
+              <div class="form-group">
+                <label>開催場所 *</label>
+                <input type="text" class="form-input" value="利用者自宅">
+              </div>
+              <div class="form-group full-width">
+                <label>開催目的 *</label>
+                <div class="radio-group">
+                  <label><input type="radio" name="purpose"> 新規作成</label>
+                  <label><input type="radio" name="purpose"> 変更</label>
+                  <label><input type="radio" name="purpose" checked> 更新</label>
+                  <label><input type="radio" name="purpose"> 区分変更</label>
+                  <label><input type="radio" name="purpose"> その他</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header">
+            <h3>出席者</h3>
+            <button class="btn btn-secondary btn-sm">+ 事業所マスタから追加</button>
+          </div>
+          <div class="card-body">
+            <div class="attendee-list">
+              <div class="attendee-row">
+                <input type="checkbox" checked>
+                <span class="check">&#9745;</span>
+                <strong>山田 花子</strong>
+                <span style="color:var(--text-muted);">（妻）- 家族</span>
+                <span style="margin-left:auto; font-size:12px; color:var(--text-muted);">意見入力 &#9998;</span>
+              </div>
+              <div class="attendee-row">
+                <input type="checkbox" checked>
+                <span class="check">&#9745;</span>
+                <strong>佐藤 一郎</strong>
+                <span style="color:var(--text-muted);">- ABC訪問介護 / サービス提供責任者</span>
+                <span style="margin-left:auto; font-size:12px; color:var(--text-muted);">意見入力 &#9998;</span>
+              </div>
+              <div class="attendee-row">
+                <input type="checkbox" checked>
+                <span class="check">&#9745;</span>
+                <strong>田中 恵</strong>
+                <span style="color:var(--text-muted);">- XYZデイサービス / 相談員</span>
+                <span style="margin-left:auto; font-size:12px; color:var(--text-muted);">意見入力 &#9998;</span>
+              </div>
+              <div class="attendee-row" style="background:var(--warning-bg);">
+                <input type="checkbox">
+                <span class="absent">&#9744; 欠席</span>
+                <strong>鈴木 健太</strong>
+                <span style="color:var(--text-muted);">- DEF訪問看護 / 看護師</span>
+                <span style="margin-left:auto; font-size:12px; color:var(--warning);">照会入力 &#9998;</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header">
+            <h3>検討項目</h3>
+            <button class="btn btn-secondary btn-sm">+ 議題追加</button>
+          </div>
+          <div class="card-body">
+            <div class="agenda-list">
+              <div class="agenda-item">
+                <div class="agenda-num">検討項目 1</div>
+                <div class="form-group" style="margin-bottom:8px;">
+                  <input type="text" class="form-input" value="現在の身体状況について" placeholder="検討項目">
+                </div>
+                <div class="form-group" style="margin-bottom:8px;">
+                  <textarea class="form-textarea" style="min-height:60px;" placeholder="検討内容...">歩行時のふらつきが増加。転倒リスクあり。入浴時の見守り強化が必要。</textarea>
+                </div>
+                <div class="form-group">
+                  <textarea class="form-textarea" style="min-height:40px;" placeholder="決定事項...">福祉用具（歩行器）の導入を検討する。福祉用具事業所に相談。</textarea>
+                </div>
+              </div>
+              <div class="agenda-item">
+                <div class="agenda-num">検討項目 2</div>
+                <div class="form-group" style="margin-bottom:8px;">
+                  <input type="text" class="form-input" value="サービス内容の変更について" placeholder="検討項目">
+                </div>
+                <div class="form-group" style="margin-bottom:8px;">
+                  <textarea class="form-textarea" style="min-height:60px;" placeholder="検討内容...">デイサービスの利用回数を週2回から週3回への増回を検討。</textarea>
+                </div>
+                <div class="form-group">
+                  <textarea class="form-textarea" style="min-height:40px;" placeholder="決定事項..."></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3>結論</h3></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label>会議の結論 *</label>
+              <textarea class="form-textarea" style="min-height:100px;" placeholder="会議で得られた結論を記載してください..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>今後の対応</label>
+              <textarea class="form-textarea" style="min-height:60px;" placeholder="今後の対応方針を記載..."></textarea>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-secondary">下書き保存</button>
+              <button class="btn btn-secondary" onclick="showPage('pdf-preview')">&#128196; PDF プレビュー</button>
+              <button class="btn btn-primary">&#128197; 保存（Googleカレンダーに同期）</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== CARE PLANS ======== -->
+    <div class="page" id="page-care-plans">
+      <div class="page-header">
+        <h2>&#128203; ケアプラン管理（簡易版）</h2>
+        <p>Phase 1: 作成日・版数・目的のみ管理 / 担当者会議の紐づけに使用</p>
+        <div class="page-header-actions">
+          <button class="btn btn-primary btn-sm">+ 新規プラン作成</button>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <select class="form-select"><option>全ての利用者</option><option>山田 太郎 様</option></select>
+        <select class="form-select"><option>全てのステータス</option><option>有効</option><option>下書き</option><option>アーカイブ</option></select>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>利用者</th>
+            <th>作成日</th>
+            <th>版数</th>
+            <th>目的</th>
+            <th>ステータス</th>
+            <th>紐づく会議</th>
+            <th>備考</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600;">山田 太郎 様</td>
+            <td>2025/09/01</td>
+            <td>第2版</td>
+            <td><span class="tag tag-blue">更新</span></td>
+            <td><span class="plan-status"><span class="plan-status-dot active"></span> 有効</span></td>
+            <td><a href="#" onclick="showPage('conference-detail')" style="color:var(--primary); font-size:12px;">2025/09/05開催</a></td>
+            <td style="font-size:12px; color:var(--text-muted);">認定更新に伴うプラン見直し</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">山田 太郎 様</td>
+            <td>2025/03/01</td>
+            <td>第1版</td>
+            <td><span class="tag tag-green">新規作成</span></td>
+            <td><span class="plan-status"><span class="plan-status-dot archived"></span> アーカイブ</span></td>
+            <td><a href="#" onclick="showPage('conference-detail')" style="color:var(--primary); font-size:12px;">2025/03/10開催</a></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">佐藤 花子 様</td>
+            <td>2025/10/01</td>
+            <td>第1版</td>
+            <td><span class="tag tag-green">新規作成</span></td>
+            <td><span class="plan-status"><span class="plan-status-dot active"></span> 有効</span></td>
+            <td><a href="#" onclick="showPage('conference-detail')" style="color:var(--primary); font-size:12px;">2025/10/05開催</a></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">鈴木 一郎 様</td>
+            <td>2025/06/01</td>
+            <td>第3版</td>
+            <td><span class="tag tag-yellow">区分変更</span></td>
+            <td><span class="plan-status"><span class="plan-status-dot active"></span> 有効</span></td>
+            <td><a href="#" onclick="showPage('conference-detail')" style="color:var(--primary); font-size:12px;">2025/06/15開催</a></td>
+            <td style="font-size:12px; color:var(--text-muted);">要介護2→3 区分変更</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ======== PDF PREVIEW (第4表) ======== -->
+    <div class="page" id="page-pdf-preview">
+      <div class="page-header">
+        <h2>&#128196; PDF プレビュー - サービス担当者会議の要点（第4表）</h2>
+        <div class="page-header-actions">
+          <button class="btn btn-primary btn-sm">&#128190; PDFダウンロード</button>
+          <button class="btn btn-secondary btn-sm">&#128424; 印刷</button>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="pdf-preview">
+          <h4>サービス担当者会議の要点（第4表）</h4>
+          <table class="pdf-table">
+            <tr>
+              <th style="width:120px;">利用者名</th>
+              <td>山田 太郎</td>
+              <th style="width:120px;">生年月日</th>
+              <td>昭和18年5月15日</td>
+            </tr>
+          </table>
+          <table class="pdf-table">
+            <tr>
+              <th style="width:120px;">開催日</th>
+              <td>令和7年9月5日</td>
+              <th style="width:120px;">開催場所</th>
+              <td>利用者自宅</td>
+            </tr>
+            <tr>
+              <th>開催回</th>
+              <td colspan="3">更新認定に伴うサービス担当者会議</td>
+            </tr>
+          </table>
+          <table class="pdf-table">
+            <tr>
+              <th colspan="4" style="text-align:center;">出席者</th>
+            </tr>
+            <tr>
+              <th>氏名</th><th>所属</th><th>職種</th><th>出欠</th>
+            </tr>
+            <tr><td>山田 花子</td><td>家族（妻）</td><td>-</td><td>出席</td></tr>
+            <tr><td>佐藤 一郎</td><td>ABC訪問介護</td><td>サービス提供責任者</td><td>出席</td></tr>
+            <tr><td>田中 恵</td><td>XYZデイサービス</td><td>相談員</td><td>出席</td></tr>
+            <tr><td>鈴木 健太</td><td>DEF訪問看護</td><td>看護師</td><td style="color:var(--warning);">欠席（照会）</td></tr>
+          </table>
+          <table class="pdf-table">
+            <tr>
+              <th colspan="3" style="text-align:center;">検討項目</th>
+            </tr>
+            <tr><th style="width:30%;">検討項目</th><th style="width:40%;">検討内容</th><th style="width:30%;">決定事項</th></tr>
+            <tr>
+              <td>現在の身体状況について</td>
+              <td>歩行時のふらつきが増加。転倒リスクあり。入浴時の見守り強化が必要。</td>
+              <td>福祉用具（歩行器）の導入を検討する。</td>
+            </tr>
+            <tr>
+              <td>サービス内容の変更について</td>
+              <td>デイサービスの利用回数を週2回から週3回への増回を検討。</td>
+              <td>来月より週3回に増回する方向で調整。</td>
+            </tr>
+          </table>
+          <table class="pdf-table">
+            <tr><th>結論</th></tr>
+            <tr><td style="min-height:60px; line-height:1.8;">
+              現在の身体状況を踏まえ、転倒予防のため福祉用具（歩行器）の導入を進める。また、日中の活動量確保のためデイサービスの利用回数を週3回に増回する。次回モニタリングにて効果を確認する。
+            </td></tr>
+          </table>
+          <div style="text-align:right; margin-top:20px; font-size:12px;">
+            <div>作成年月日: 令和7年9月5日</div>
+            <div>居宅介護支援事業所: さくらケアプランセンター</div>
+            <div>介護支援専門員: 田中 美咲</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== PDF PREVIEW (第5表) ======== -->
+    <div class="page" id="page-pdf-preview-5">
+      <div class="page-header">
+        <h2>&#128196; PDF プレビュー - 居宅介護支援経過記録（第5表）</h2>
+        <div class="page-header-actions">
+          <button class="btn btn-primary btn-sm">&#128190; PDFダウンロード</button>
+          <button class="btn btn-secondary btn-sm">&#128424; 印刷</button>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="pdf-preview">
+          <h4>居宅介護支援経過記録（第5表）</h4>
+          <table class="pdf-table" style="margin-bottom:8px;">
+            <tr>
+              <th style="width:100px;">利用者名</th><td>山田 太郎</td>
+              <th style="width:100px;">出力期間</th><td>令和8年1月1日 〜 令和8年2月5日</td>
+            </tr>
+          </table>
+          <table class="pdf-table">
+            <tr>
+              <th style="width:100px;">日時</th>
+              <th style="width:60px;">区分</th>
+              <th>内容</th>
+              <th style="width:100px;">関係機関</th>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap;">R8.2.4<br>14:30</td>
+              <td>訪問</td>
+              <td>自宅訪問。体調良好。血圧128/82。食事量も安定しており、デイサービスの利用も継続的に行えている。<br><strong>【判断】</strong>サービス継続で問題なし。次回モニタリング時に歩行状態を再確認。</td>
+              <td>-</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap;">R8.2.3<br>10:15</td>
+              <td>電話</td>
+              <td>デイサービスより連絡。先週の利用状況について報告あり。レクリエーション活動に積極的に参加。</td>
+              <td>ABCデイサービス</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap;">R8.1.20<br>11:00</td>
+              <td>電話</td>
+              <td>訪問介護事業所より連絡。入浴時の見守り強化の必要性について相談あり。転倒リスクの増加を報告。<br><strong>【判断】</strong>次回訪問時に実際の状況を確認。必要に応じてサービス担当者会議を開催。</td>
+              <td>ABC訪問介護</td>
+            </tr>
+            <tr>
+              <td style="white-space:nowrap;">R8.1.10<br>15:00</td>
+              <td>訪問</td>
+              <td>月次モニタリング訪問。歩行時のふらつきが若干みられる。本人は「大丈夫」とのこと。<br><strong>【判断】</strong>福祉用具（歩行器）の導入を検討。福祉用具事業所に相談予定。<br><strong>【家族意見】</strong>長女「転んでからでは遅い。早めに対策してほしい」</td>
+              <td>-</td>
+            </tr>
+          </table>
+          <div style="text-align:right; margin-top:20px; font-size:12px;">
+            <div>居宅介護支援事業所: さくらケアプランセンター</div>
+            <div>介護支援専門員: 田中 美咲</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== SETTINGS ======== -->
+    <div class="page" id="page-settings">
+      <div class="settings-layout">
+        <div class="settings-nav">
+          <div class="settings-nav-item active">&#128100; プロフィール</div>
+          <div class="settings-nav-item">&#127973; 事業所情報</div>
+          <div class="settings-nav-item">&#128197; Googleカレンダー</div>
+          <div class="settings-nav-item">&#128274; セキュリティ</div>
+          <div class="settings-nav-item">&#128276; 通知設定</div>
+          <div class="settings-nav-item">&#128101; ユーザー管理</div>
+          <div class="settings-nav-item">&#128196; テンプレート</div>
+        </div>
+        <div class="settings-content">
+          <h2 style="font-size:20px; margin-bottom:20px;">プロフィール設定</h2>
+          <div class="card">
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>氏名</label>
+                  <input type="text" class="form-input" value="田中 美咲">
+                </div>
+                <div class="form-group">
+                  <label>メールアドレス</label>
+                  <input type="email" class="form-input" value="tanaka@sakura-care.jp">
+                </div>
+                <div class="form-group">
+                  <label>職種</label>
+                  <input type="text" class="form-input" value="主任介護支援専門員">
+                </div>
+                <div class="form-group">
+                  <label>ロール</label>
+                  <select class="form-select"><option>管理者</option><option>一般ユーザー</option></select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <h3 style="font-size:16px; margin: 24px 0 12px;">Googleアカウント連携</h3>
+          <div class="card">
+            <div class="card-body">
+              <div style="display:flex; align-items:center; gap:16px;">
+                <div style="width:40px; height:40px; background:var(--success-bg); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--success); font-size:20px;">&#9989;</div>
+                <div>
+                  <div style="font-weight:600;">tanaka.misaki@gmail.com</div>
+                  <div style="font-size:12px; color:var(--text-muted);">接続済み / カレンダーAPI有効 / 最終同期: 2026/02/05 08:45</div>
+                </div>
+                <button class="btn btn-secondary btn-sm" style="margin-left:auto;">再接続</button>
+              </div>
+              <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
+                <div style="font-size:13px; font-weight:600; margin-bottom:8px;">同期カレンダー</div>
+                <div style="display:flex; gap:24px;">
+                  <div style="display:flex; align-items:center; gap:6px; font-size:13px;">
+                    <span style="color:var(--success);">&#9679;</span> KaigoIDE_支援経過記録
+                  </div>
+                  <div style="display:flex; align-items:center; gap:6px; font-size:13px;">
+                    <span style="color:var(--primary);">&#9679;</span> KaigoIDE_担当者会議
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== PROVIDERS MASTER ======== -->
+    <div class="page" id="page-providers">
+      <div class="page-header">
+        <h2>&#127973; 事業所マスタ</h2>
+        <p>担当者会議の出席者選択に使用するサービス事業所を管理します</p>
+        <div class="page-header-actions">
+          <button class="btn btn-primary btn-sm">+ 事業所追加</button>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>事業所名</th><th>種別</th><th>担当者</th><th>電話番号</th><th>登録利用者数</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600;">ABC訪問介護ステーション</td><td><span class="tag tag-blue">訪問介護</span></td><td>佐藤 一郎</td><td>03-1111-2222</td><td>8名</td></tr>
+          <tr><td style="font-weight:600;">XYZデイサービスセンター</td><td><span class="tag tag-green">通所介護</span></td><td>田中 恵</td><td>03-3333-4444</td><td>5名</td></tr>
+          <tr><td style="font-weight:600;">DEF訪問看護ステーション</td><td><span class="tag tag-yellow">訪問看護</span></td><td>鈴木 健太</td><td>03-5555-6666</td><td>3名</td></tr>
+          <tr><td style="font-weight:600;">GHI福祉用具センター</td><td><span class="tag tag-gray">福祉用具</span></td><td>高橋 修</td><td>03-7777-8888</td><td>6名</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ======== TEMPLATES ======== -->
+    <div class="page" id="page-templates">
+      <div class="page-header">
+        <h2>&#128196; テンプレート管理</h2>
+        <p>支援経過記録・担当者会議で使用する定型文テンプレート</p>
+        <div class="page-header-actions">
+          <button class="btn btn-primary btn-sm">+ テンプレート追加</button>
+        </div>
+      </div>
+      <div class="page-body">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div class="card">
+            <div class="card-header"><h3>第5表テンプレート</h3></div>
+            <div class="card-body" style="padding:8px 16px;">
+              <div style="padding:10px 0; border-bottom:1px solid var(--border-light); cursor:pointer;">
+                <div style="font-weight:600; font-size:13px;">月次モニタリング訪問</div>
+                <div style="font-size:12px; color:var(--text-muted);">自宅訪問。体調{良好/不良}。血圧{値}。{サービス利用状況}...</div>
+              </div>
+              <div style="padding:10px 0; border-bottom:1px solid var(--border-light); cursor:pointer;">
+                <div style="font-weight:600; font-size:13px;">サービス事業所からの連絡</div>
+                <div style="font-size:12px; color:var(--text-muted);">{事業所名}より連絡。{連絡内容}について報告あり...</div>
+              </div>
+              <div style="padding:10px 0; cursor:pointer;">
+                <div style="font-weight:600; font-size:13px;">電話対応（利用者・家族）</div>
+                <div style="font-size:12px; color:var(--text-muted);">{利用者/家族名}より電話。{相談内容}について相談あり...</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>第4表 議題テンプレート</h3></div>
+            <div class="card-body" style="padding:8px 16px;">
+              <div style="padding:10px 0; border-bottom:1px solid var(--border-light); cursor:pointer;">
+                <div style="font-weight:600; font-size:13px;">新規ケアプラン作成</div>
+                <div style="font-size:12px; color:var(--text-muted);">現状の課題、目標設定、サービス内容の検討</div>
+              </div>
+              <div style="padding:10px 0; border-bottom:1px solid var(--border-light); cursor:pointer;">
+                <div style="font-weight:600; font-size:13px;">更新認定後の見直し</div>
+                <div style="font-size:12px; color:var(--text-muted);">認定結果の確認、サービス内容の継続・変更検討</div>
+              </div>
+              <div style="padding:10px 0; cursor:pointer;">
+                <div style="font-weight:600; font-size:13px;">状態変化に伴う変更</div>
+                <div style="font-size:12px; color:var(--text-muted);">状態変化の共有、サービス変更の検討</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ---- Status Bar ---- -->
+  <footer class="statusbar">
+    <div class="statusbar-item">
+      <span class="statusbar-dot"></span>
+      接続中
+    </div>
+    <div class="statusbar-item">&#128197; Googleカレンダー同期: 正常</div>
+    <div class="statusbar-item">&#128101; さくらケアプランセンター</div>
+    <div class="statusbar-right">
+      <div class="statusbar-item">Phase 1 (MVP)</div>
+      <div class="statusbar-item">v0.1.0</div>
+    </div>
+  </footer>
+</div>
+
+<!-- ---- Quick Input Panel ---- -->
+<div class="quick-panel" id="quickPanel">
+  <div class="quick-panel-header">
+    <h3>&#9999; クイック記録入力（第5表）</h3>
+    <button class="btn-icon" style="border:none; background:none;" onclick="toggleQuickPanel()">&times;</button>
+  </div>
+  <div class="quick-panel-body">
+    <div class="form-group">
+      <label>利用者</label>
+      <select class="form-select">
+        <option>山田 太郎 様</option>
+        <option>佐藤 花子 様</option>
+        <option>鈴木 一郎 様</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>区分</label>
+      <div class="radio-group">
+        <label><input type="radio" name="qcat" checked> 訪問</label>
+        <label><input type="radio" name="qcat"> 電話</label>
+        <label><input type="radio" name="qcat"> その他</label>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>内容</label>
+      <div style="margin-bottom:6px;">
+        <button class="btn btn-secondary btn-sm">&#127908; 音声入力</button>
+      </div>
+      <textarea class="form-textarea" style="min-height:120px;" placeholder="記録内容を入力..."></textarea>
+    </div>
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+      <button class="btn btn-secondary btn-sm" onclick="toggleQuickPanel()">キャンセル</button>
+      <button class="btn btn-primary btn-sm">&#128197; 保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ---- Responsive Warning ---- -->
+<div class="responsive-indicator">
+  <div style="font-size:48px; margin-bottom:16px;">&#128187;</div>
+  <h2 style="font-size:18px; margin-bottom:8px;">デスクトップ表示推奨</h2>
+  <p style="color:var(--text-muted); font-size:14px;">このモックアップはPCサイズ（900px以上）での<br>閲覧を推奨しています。</p>
+</div>
+
+<script>
+// ============================================
+// Navigation & Tab Management
+// ============================================
+
+const pages = {
+  'dashboard':        { title: '&#127968; ダッシュボード',          sidebar: 'ダッシュボード' },
+  'clients':          { title: '&#128101; 利用者一覧',              sidebar: '利用者一覧' },
+  'client-detail':    { title: '&#128100; 山田太郎様',              sidebar: '利用者一覧' },
+  'client-new':       { title: '&#128101; 利用者新規登録',          sidebar: '利用者一覧' },
+  'care-records':     { title: '&#128221; 支援経過記録（第5表）',   sidebar: '支援経過記録（第5表）' },
+  'care-record-new':  { title: '&#128221; 新規記録作成',            sidebar: '支援経過記録（第5表）' },
+  'care-record-detail':{ title: '&#128221; 記録詳細',               sidebar: '支援経過記録（第5表）' },
+  'conferences':      { title: '&#128483; 担当者会議（第4表）',     sidebar: '担当者会議（第4表）' },
+  'conference-new':   { title: '&#128483; 会議作成',                sidebar: '担当者会議（第4表）' },
+  'conference-detail': { title: '&#128483; 会議詳細',               sidebar: '担当者会議（第4表）' },
+  'care-plans':       { title: '&#128203; ケアプラン管理',          sidebar: 'ケアプラン管理' },
+  'providers':        { title: '&#127973; 事業所マスタ',            sidebar: '事業所マスタ' },
+  'templates':        { title: '&#128196; テンプレート',            sidebar: 'テンプレート' },
+  'settings':         { title: '&#9881; 設定',                     sidebar: '設定' },
+  'pdf-preview':      { title: '&#128196; PDF 第4表プレビュー',     sidebar: '担当者会議（第4表）' },
+  'pdf-preview-5':    { title: '&#128196; PDF 第5表プレビュー',     sidebar: '支援経過記録（第5表）' },
+};
+
+let openTabs = ['dashboard'];
+let activeTab = 'dashboard';
+
+function showPage(pageId) {
+  if (!pages[pageId]) return;
+
+  // Add to tabs if not exists
+  if (!openTabs.includes(pageId)) {
+    openTabs.push(pageId);
+  }
+  activeTab = pageId;
+
+  // Update pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById('page-' + pageId);
+  if (el) el.classList.add('active');
+
+  // Update sidebar
+  document.querySelectorAll('.sidebar-item').forEach(item => {
+    item.classList.remove('active');
+    if (item.textContent.trim().includes(pages[pageId].sidebar)) {
+      item.classList.add('active');
+    }
+  });
+
+  // Update tabs
+  renderTabs();
+}
+
+function renderTabs() {
+  const tabBar = document.getElementById('tabBar');
+  tabBar.innerHTML = '';
+  openTabs.forEach(id => {
+    const tab = document.createElement('button');
+    tab.className = 'tab' + (id === activeTab ? ' active' : '');
+    tab.dataset.page = id;
+    tab.innerHTML = pages[id].title +
+      (id !== 'dashboard' ? ' <span class="tab-close" onclick="event.stopPropagation(); closeTab(\'' + id + '\')">&times;</span>' : '');
+    tab.onclick = () => showPage(id);
+    tabBar.appendChild(tab);
+  });
+}
+
+function closeTab(pageId) {
+  const idx = openTabs.indexOf(pageId);
+  if (idx === -1) return;
+  openTabs.splice(idx, 1);
+  if (activeTab === pageId) {
+    activeTab = openTabs[Math.min(idx, openTabs.length - 1)] || 'dashboard';
+  }
+  showPage(activeTab);
+}
+
+// Login
+function doLogin() {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('appShell').classList.add('visible');
+}
+
+// Quick Panel
+function toggleQuickPanel() {
+  document.getElementById('quickPanel').classList.toggle('open');
+}
+
+// Init
+renderTabs();
+</script>
+</body>
+</html>

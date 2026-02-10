@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// === テナント（事業所） ===
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  users   User[]
+  clients Client[]
+
+  @@map("tenants")
+}
+
+// === ユーザー ===
+model User {
+  id                 String   @id @default(cuid())
+  email              String   @unique
+  name               String
+  role               UserRole @default(CARE_MANAGER)
+  tenantId           String   @map("tenant_id")
+  googleAccessToken  String?  @map("google_access_token")
+  googleRefreshToken String?  @map("google_refresh_token")
+  hashedPassword     String?  @map("hashed_password")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  tenant            Tenant             @relation(fields: [tenantId], references: [id])
+  careRecords       CareRecord[]
+  monitoringRecords MonitoringRecord[]
+
+  @@index([tenantId])
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  CARE_MANAGER
+}
+
+// === 利用者 ===
+model Client {
+  id                String    @id @default(cuid())
+  tenantId          String    @map("tenant_id")
+  familyName        String    @map("family_name")
+  givenName         String    @map("given_name")
+  familyNameKana    String    @map("family_name_kana")
+  givenNameKana     String    @map("given_name_kana")
+  birthDate         DateTime  @map("birth_date")
+  gender            Gender
+  insuranceNumber   String    @map("insurance_number")
+  careLevel         CareLevel @map("care_level")
+  certificationDate DateTime  @map("certification_date")
+  address           String?
+  phone             String?
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  tenant            Tenant             @relation(fields: [tenantId], references: [id])
+  carePlans         CarePlan[]
+  careRecords       CareRecord[]
+  monitoringRecords MonitoringRecord[]
+
+  @@index([tenantId])
+  @@map("clients")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum CareLevel {
+  SUPPORT_1
+  SUPPORT_2
+  CARE_1
+  CARE_2
+  CARE_3
+  CARE_4
+  CARE_5
+}
+
+// === ケアプラン簡易管理 ===
+model CarePlan {
+  id          String   @id @default(cuid())
+  clientId    String   @map("client_id")
+  version     Int
+  createdDate DateTime @map("created_date")
+  purpose     String   @default("")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  client            Client             @relation(fields: [clientId], references: [id])
+  goals             CarePlanGoal[]
+  monitoringRecords MonitoringRecord[]
+
+  @@unique([clientId, version])
+  @@index([clientId])
+  @@map("care_plans")
+}
+
+// === ケアプラン目標 ===
+model CarePlanGoal {
+  id         String   @id @default(cuid())
+  carePlanId String   @map("care_plan_id")
+  type       GoalType
+  text       String
+  sortOrder  Int      @default(0) @map("sort_order")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  carePlan              CarePlan               @relation(fields: [carePlanId], references: [id], onDelete: Cascade)
+  monitoringEvaluations MonitoringEvaluation[]
+
+  @@index([carePlanId])
+  @@map("care_plan_goals")
+}
+
+enum GoalType {
+  SHORT_TERM
+  LONG_TERM
+}
+
+// === 支援経過記録（一般記録・タイプ2） ===
+model CareRecord {
+  id                    String             @id @default(cuid())
+  clientId              String             @map("client_id")
+  recordDate            DateTime           @map("record_date")
+  category              CareRecordCategory
+  content               String
+  relatedOrganization   String?            @map("related_organization")
+  professionalJudgment  String?            @map("professional_judgment")
+  clientFamilyOpinion   String?            @map("client_family_opinion")
+  googleCalendarEventId String?            @map("google_calendar_event_id")
+  createdById           String             @map("created_by_id")
+  createdAt             DateTime           @default(now()) @map("created_at")
+  updatedAt             DateTime           @updatedAt @map("updated_at")
+
+  client    Client @relation(fields: [clientId], references: [id])
+  createdBy User   @relation(fields: [createdById], references: [id])
+
+  @@index([clientId, recordDate(sort: Desc)])
+  @@map("care_records")
+}
+
+enum CareRecordCategory {
+  VISIT
+  PHONE
+  FAX
+  MAIL
+  CONFERENCE
+  OTHER
+}
+
+// === モニタリング評価記録（タイプ1） ===
+model MonitoringRecord {
+  id                    String   @id @default(cuid())
+  clientId              String   @map("client_id")
+  carePlanId            String   @map("care_plan_id")
+  recordDate            DateTime @map("record_date")
+  overallComment        String   @map("overall_comment")
+  professionalJudgment  String   @map("professional_judgment")
+  nextAction            String   @map("next_action")
+  googleCalendarEventId String?  @map("google_calendar_event_id")
+  createdById           String   @map("created_by_id")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  client      Client                 @relation(fields: [clientId], references: [id])
+  carePlan    CarePlan               @relation(fields: [carePlanId], references: [id])
+  createdBy   User                   @relation(fields: [createdById], references: [id])
+  evaluations MonitoringEvaluation[]
+
+  @@index([clientId, recordDate(sort: Desc)])
+  @@map("monitoring_records")
+}
+
+// === モニタリング評価（目標別） ===
+model MonitoringEvaluation {
+  id                 String @id @default(cuid())
+  monitoringRecordId String @map("monitoring_record_id")
+  goalId             String @map("goal_id")
+  goalText           String @map("goal_text")
+  rating             Int
+  comment            String @default("")
+
+  monitoringRecord MonitoringRecord @relation(fields: [monitoringRecordId], references: [id], onDelete: Cascade)
+  goal             CarePlanGoal     @relation(fields: [goalId], references: [id])
+
+  @@index([monitoringRecordId])
+  @@map("monitoring_evaluations")
+}

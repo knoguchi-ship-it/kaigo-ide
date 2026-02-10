@@ -1,0 +1,2740 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KaigoIDE - 仕様草案</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 280px;
+      height: 100vh;
+      background: var(--card-bg);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .nav-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+    }
+
+    .nav-header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .nav-header p {
+      font-size: 0.875rem;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    .nav-section {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-section-title {
+      padding: 8px 24px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .nav-link {
+      display: block;
+      padding: 10px 24px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .nav-link:hover {
+      background: var(--bg);
+      color: var(--primary);
+    }
+
+    .nav-link.active {
+      background: #eff6ff;
+      color: var(--primary);
+      border-right: 3px solid var(--primary);
+    }
+
+    /* Main Content */
+    .main {
+      margin-left: 280px;
+      padding: 32px 48px;
+      max-width: 1200px;
+    }
+
+    /* Sections */
+    .section {
+      margin-bottom: 48px;
+      scroll-margin-top: 24px;
+    }
+
+    .section-header {
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--primary);
+    }
+
+    .section-header h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .section-header p {
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 16px 24px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 24px;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: var(--bg);
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    tr:hover {
+      background: #f8fafc;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-primary {
+      background: #dbeafe;
+      color: var(--primary);
+    }
+
+    .badge-success {
+      background: #d1fae5;
+      color: var(--success);
+    }
+
+    .badge-warning {
+      background: #fef3c7;
+      color: var(--warning);
+    }
+
+    .badge-danger {
+      background: #fee2e2;
+      color: var(--danger);
+    }
+
+    .badge-muted {
+      background: #f1f5f9;
+      color: var(--secondary);
+    }
+
+    /* Priority indicators */
+    .priority-high {
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    .priority-must {
+      background: var(--danger);
+      color: white;
+    }
+
+    .priority-should {
+      background: var(--warning);
+      color: white;
+    }
+
+    .priority-could {
+      background: var(--secondary);
+      color: white;
+    }
+
+    /* Grid */
+    .grid {
+      display: grid;
+      gap: 24px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .grid-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* Stats */
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .stat-card h3 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-card p {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    /* Code blocks */
+    pre {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.875rem;
+    }
+
+    /* Lists */
+    ul, ol {
+      padding-left: 24px;
+      margin: 12px 0;
+    }
+
+    li {
+      margin: 8px 0;
+    }
+
+    /* Headings in content */
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 24px 0 12px 0;
+      color: var(--text);
+    }
+
+    h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 16px 0 8px 0;
+      color: var(--text);
+    }
+
+    /* Diagrams */
+    .diagram {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      overflow-x: auto;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      white-space: pre;
+    }
+
+    /* Timeline */
+    .timeline {
+      position: relative;
+      padding-left: 32px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 8px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-bottom: 24px;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -28px;
+      top: 4px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 2px solid white;
+      box-shadow: 0 0 0 2px var(--primary);
+    }
+
+    .timeline-item.completed::before {
+      background: var(--success);
+      box-shadow: 0 0 0 2px var(--success);
+    }
+
+    /* Alert boxes */
+    .alert {
+      padding: 16px 20px;
+      border-radius: 8px;
+      margin: 16px 0;
+    }
+
+    .alert-info {
+      background: #eff6ff;
+      border-left: 4px solid var(--primary);
+    }
+
+    .alert-warning {
+      background: #fffbeb;
+      border-left: 4px solid var(--warning);
+    }
+
+    .alert-success {
+      background: #ecfdf5;
+      border-left: 4px solid var(--success);
+    }
+
+    /* Feature list */
+    .feature-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg);
+      border-radius: 8px;
+    }
+
+    .feature-item .icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary);
+      color: white;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    /* Status */
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .status-dot.active {
+      background: var(--success);
+    }
+
+    .status-dot.pending {
+      background: var(--warning);
+    }
+
+    .status-dot.inactive {
+      background: var(--secondary);
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .tab {
+      padding: 12px 24px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .tab:hover {
+      color: var(--text);
+    }
+
+    .tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .nav {
+        width: 240px;
+      }
+      .main {
+        margin-left: 240px;
+        padding: 24px;
+      }
+      .grid-3, .grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav {
+        transform: translateX(-100%);
+      }
+      .main {
+        margin-left: 0;
+      }
+      .grid-2, .grid-3, .grid-4 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Print */
+    @media print {
+      .nav {
+        display: none;
+      }
+      .main {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <div class="nav-header">
+    <h1>KaigoIDE</h1>
+    <p>仕様草案 v0.1.0</p>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">概要</div>
+    <a href="#overview" class="nav-link active">プロジェクト概要</a>
+    <a href="#vision" class="nav-link">ビジョン・目標</a>
+    <a href="#scope" class="nav-link">スコープ</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">SOW - 作業範囲</div>
+    <a href="#sow-deliverables" class="nav-link">成果物</a>
+    <a href="#sow-milestones" class="nav-link">マイルストーン</a>
+    <a href="#sow-risks" class="nav-link">リスク</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">PRD - 要件定義</div>
+    <a href="#prd-users" class="nav-link">ターゲットユーザー</a>
+    <a href="#prd-features" class="nav-link">機能要件</a>
+    <a href="#prd-f5" class="nav-link">★ 第5表（支援経過）</a>
+    <a href="#prd-f4" class="nav-link">★ 第4表（担当者会議）</a>
+    <a href="#prd-careplan" class="nav-link">★ ケアプラン簡易管理</a>
+    <a href="#prd-nfr" class="nav-link">非機能要件</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">SDD - 設計</div>
+    <a href="#sdd-architecture" class="nav-link">アーキテクチャ</a>
+    <a href="#sdd-tech-stack" class="nav-link">技術スタック</a>
+    <a href="#sdd-frontend" class="nav-link">フロントエンド設計</a>
+    <a href="#sdd-backend" class="nav-link">バックエンド設計</a>
+    <a href="#sdd-database" class="nav-link">データベース設計</a>
+    <a href="#sdd-api" class="nav-link">API設計</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">ADR - 技術決定</div>
+    <a href="#adr-list" class="nav-link">決定一覧</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">付録</div>
+    <a href="#glossary" class="nav-link">用語集</a>
+    <a href="#references" class="nav-link">参考資料</a>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<main class="main">
+
+  <!-- ==================== OVERVIEW ==================== -->
+  <section id="overview" class="section">
+    <div class="section-header">
+      <h2>プロジェクト概要</h2>
+      <p>KaigoIDE - 居宅介護支援事業所向け総合業務支援システム</p>
+    </div>
+
+    <div class="grid grid-4">
+      <div class="stat-card">
+        <h3>Phase 1</h3>
+        <p>MVP（第5表・第4表）</p>
+      </div>
+      <div class="stat-card">
+        <h3>7</h3>
+        <p>全フェーズの帳票種類</p>
+      </div>
+      <div class="stat-card">
+        <h3>3</h3>
+        <p>対応デバイス種類</p>
+      </div>
+      <div class="stat-card">
+        <h3>SaaS</h3>
+        <p>提供形態</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">基本要件</div>
+      <div class="card-body">
+        <table>
+          <tr>
+            <th style="width: 200px;">要件</th>
+            <th>内容</th>
+          </tr>
+          <tr>
+            <td>動作環境</td>
+            <td>モダンブラウザ（Chrome, Safari, Edge, Firefox）</td>
+          </tr>
+          <tr>
+            <td>対応デバイス</td>
+            <td>PC、タブレット、スマートフォン（レスポンシブ対応）</td>
+          </tr>
+          <tr>
+            <td>アーキテクチャ</td>
+            <td>SaaS型クラウドサービス + PWA対応</td>
+          </tr>
+          <tr>
+            <td>オフライン対応</td>
+            <td>一部機能のオフライン動作対応（PWA）</td>
+          </tr>
+          <tr>
+            <td>データ連携</td>
+            <td>厚労省ケアプランデータ連携標準仕様（V3/V4）対応</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VISION ==================== -->
+  <section id="vision" class="section">
+    <div class="section-header">
+      <h2>ビジョン・目標</h2>
+      <p>プロダクトが目指す姿と成功指標</p>
+    </div>
+
+    <div class="alert alert-info">
+      <strong>ミッションステートメント</strong><br>
+      「ケアマネジャーが本来の仕事 ─ 利用者に寄り添う支援 ─ に集中できる環境を創る」
+    </div>
+
+    <div class="card">
+      <div class="card-header">KPI（成功指標）</div>
+      <div class="card-body">
+        <table>
+          <tr>
+            <th>指標</th>
+            <th>現状</th>
+            <th>目標（6ヶ月後）</th>
+            <th>目標（1年後）</th>
+          </tr>
+          <tr>
+            <td>記録作成時間</td>
+            <td>-</td>
+            <td><span class="badge badge-success">30%削減</span></td>
+            <td><span class="badge badge-success">50%削減</span></td>
+          </tr>
+          <tr>
+            <td>ユーザー満足度（NPS）</td>
+            <td>-</td>
+            <td>+30</td>
+            <td>+50</td>
+          </tr>
+          <tr>
+            <td>月間アクティブ事業所</td>
+            <td>0</td>
+            <td>100事業所</td>
+            <td>500事業所</td>
+          </tr>
+          <tr>
+            <td>機能利用率（第5表）</td>
+            <td>-</td>
+            <td>80%</td>
+            <td>95%</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SCOPE ==================== -->
+  <section id="scope" class="section">
+    <div class="section-header">
+      <h2>スコープ</h2>
+      <p>開発対象の範囲と優先順位</p>
+    </div>
+
+    <div class="card">
+      <div class="card-header">フェーズ別開発スコープ</div>
+      <div class="card-body">
+        <h3>Phase 1（MVP）- 最優先</h3>
+        <div class="feature-list">
+          <div class="feature-item">
+            <div class="icon">★</div>
+            <div>
+              <strong>支援経過記録（第5表）</strong><br>
+              <span style="color: var(--text-muted);">記録作成、検索、PDF出力</span>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="icon">★</div>
+            <div>
+              <strong>担当者会議記録（第4表）</strong><br>
+              <span style="color: var(--text-muted);">会議記録作成、出席者管理、PDF出力</span>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="icon">◎</div>
+            <div>
+              <strong>利用者管理</strong><br>
+              <span style="color: var(--text-muted);">基本情報、保険情報の登録・管理</span>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="icon">◎</div>
+            <div>
+              <strong>認証・認可</strong><br>
+              <span style="color: var(--text-muted);">ログイン、ロール管理</span>
+            </div>
+          </div>
+        </div>
+
+        <h3 style="margin-top: 32px;">Phase 2</h3>
+        <ul>
+          <li>ケアプラン（第1〜3表）</li>
+          <li>サービス利用票（第6〜7表）</li>
+          <li>ケアプランデータ連携システム対応</li>
+        </ul>
+
+        <h3>Phase 3</h3>
+        <ul>
+          <li>アセスメント機能</li>
+          <li>モニタリング機能</li>
+          <li>LIFE連携</li>
+        </ul>
+
+        <h3>Phase 4</h3>
+        <ul>
+          <li>請求管理</li>
+          <li>国保連伝送</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">対象外範囲（Out of Scope）</div>
+      <div class="card-body">
+        <table>
+          <tr>
+            <th>項目</th>
+            <th>理由</th>
+          </tr>
+          <tr>
+            <td>ネイティブモバイルアプリ</td>
+            <td>PWAで代替。将来検討</td>
+          </tr>
+          <tr>
+            <td>他社介護ソフトとの直接連携</td>
+            <td>標準仕様CSVでの連携を優先</td>
+          </tr>
+          <tr>
+            <td>訪問介護・デイサービス等の業務機能</td>
+            <td>居宅介護支援に特化</td>
+          </tr>
+          <tr>
+            <td>オンプレミス版</td>
+            <td>クラウド（SaaS）のみ</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SOW DELIVERABLES ==================== -->
+  <section id="sow-deliverables" class="section">
+    <div class="section-header">
+      <h2>成果物（Deliverables）</h2>
+      <p>SOW - プロジェクトで作成する成果物</p>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header">開発成果物</div>
+        <div class="card-body">
+          <table>
+            <tr>
+              <th>ID</th>
+              <th>成果物</th>
+              <th>Phase</th>
+            </tr>
+            <tr>
+              <td>D-001</td>
+              <td>Webアプリケーション（React SPA）</td>
+              <td><span class="badge badge-primary">Phase 1</span></td>
+            </tr>
+            <tr>
+              <td>D-002</td>
+              <td>バックエンドAPI（REST API）</td>
+              <td><span class="badge badge-primary">Phase 1</span></td>
+            </tr>
+            <tr>
+              <td>D-003</td>
+              <td>データベース（PostgreSQL）</td>
+              <td><span class="badge badge-primary">Phase 1</span></td>
+            </tr>
+            <tr>
+              <td>D-004</td>
+              <td>PWA対応（Service Worker）</td>
+              <td><span class="badge badge-primary">Phase 1</span></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">ドキュメント成果物</div>
+        <div class="card-body">
+          <table>
+            <tr>
+              <th>ID</th>
+              <th>成果物</th>
+              <th>Phase</th>
+            </tr>
+            <tr>
+              <td>D-101</td>
+              <td>PRD（プロダクト要件定義書）</td>
+              <td><span class="badge badge-primary">Phase 1</span></td>
+            </tr>
+            <tr>
+              <td>D-102</td>
+              <td>SDD（ソフトウェア設計書）</td>
+              <td><span class="badge badge-primary">Phase 1</span></td>
+            </tr>
+            <tr>
+              <td>D-103</td>
+              <td>ADR（アーキテクチャ決定記録）</td>
+              <td><span class="badge badge-primary">Phase 1</span></td>
+            </tr>
+            <tr>
+              <td>D-104</td>
+              <td>API仕様書（OpenAPI 3.0）</td>
+              <td><span class="badge badge-primary">Phase 1</span></td>
+            </tr>
+            <tr>
+              <td>D-105</td>
+              <td>ユーザーマニュアル</td>
+              <td><span class="badge badge-muted">Phase 2</span></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SOW MILESTONES ==================== -->
+  <section id="sow-milestones" class="section">
+    <div class="section-header">
+      <h2>マイルストーン</h2>
+      <p>SOW - Phase 1の主要マイルストーン</p>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="timeline">
+          <div class="timeline-item">
+            <strong>M-001: プロジェクトキックオフ</strong>
+            <p style="color: var(--text-muted);">SOW/PRD承認</p>
+          </div>
+          <div class="timeline-item">
+            <strong>M-002: 設計完了</strong>
+            <p style="color: var(--text-muted);">SDD/ADR承認、技術検証完了</p>
+          </div>
+          <div class="timeline-item">
+            <strong>M-003: 開発環境構築</strong>
+            <p style="color: var(--text-muted);">CI/CD稼働、開発者オンボーディング完了</p>
+          </div>
+          <div class="timeline-item">
+            <strong>M-004: 第5表機能完成</strong>
+            <p style="color: var(--text-muted);">支援経過記録の全機能実装・テスト完了</p>
+          </div>
+          <div class="timeline-item">
+            <strong>M-005: 第4表機能完成</strong>
+            <p style="color: var(--text-muted);">担当者会議の全機能実装・テスト完了</p>
+          </div>
+          <div class="timeline-item">
+            <strong>M-006: MVP完成</strong>
+            <p style="color: var(--text-muted);">全Phase1機能実装、結合テスト完了</p>
+          </div>
+          <div class="timeline-item">
+            <strong>M-007: ベータリリース</strong>
+            <p style="color: var(--text-muted);">限定ユーザーへの提供開始</p>
+          </div>
+          <div class="timeline-item">
+            <strong>M-008: 正式リリース</strong>
+            <p style="color: var(--text-muted);">一般提供開始</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SOW RISKS ==================== -->
+  <section id="sow-risks" class="section">
+    <div class="section-header">
+      <h2>リスク管理</h2>
+      <p>SOW - 想定されるリスクと対策</p>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <table>
+          <tr>
+            <th>ID</th>
+            <th>リスク</th>
+            <th>影響度</th>
+            <th>発生確率</th>
+            <th>対策</th>
+          </tr>
+          <tr>
+            <td>R-001</td>
+            <td>制度改正による仕様変更</td>
+            <td><span class="badge badge-danger">高</span></td>
+            <td><span class="badge badge-warning">中</span></td>
+            <td>モジュラー設計で変更容易性確保</td>
+          </tr>
+          <tr>
+            <td>R-002</td>
+            <td>セキュリティインシデント</td>
+            <td><span class="badge badge-danger">高</span></td>
+            <td><span class="badge badge-success">低</span></td>
+            <td>セキュリティ設計の徹底、第三者診断</td>
+          </tr>
+          <tr>
+            <td>R-003</td>
+            <td>ユーザー採用率低迷</td>
+            <td><span class="badge badge-warning">中</span></td>
+            <td><span class="badge badge-warning">中</span></td>
+            <td>UXテスト、段階的機能追加</td>
+          </tr>
+          <tr>
+            <td>R-004</td>
+            <td>技術的負債の蓄積</td>
+            <td><span class="badge badge-warning">中</span></td>
+            <td><span class="badge badge-warning">中</span></td>
+            <td>コードレビュー、リファクタリング計画</td>
+          </tr>
+          <tr>
+            <td>R-005</td>
+            <td>主要メンバーの離脱</td>
+            <td><span class="badge badge-danger">高</span></td>
+            <td><span class="badge badge-success">低</span></td>
+            <td>ドキュメント整備、ナレッジ共有</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PRD USERS ==================== -->
+  <section id="prd-users" class="section">
+    <div class="section-header">
+      <h2>ターゲットユーザー</h2>
+      <p>PRD - ユーザー像とペルソナ</p>
+    </div>
+
+    <div class="card">
+      <div class="card-header">プライマリーユーザー：介護支援専門員（ケアマネジャー）</div>
+      <div class="card-body">
+        <table>
+          <tr>
+            <th style="width: 150px;">属性</th>
+            <th>詳細</th>
+          </tr>
+          <tr>
+            <td>年齢層</td>
+            <td>30〜60代（中心は40〜50代）</td>
+          </tr>
+          <tr>
+            <td>IT習熟度</td>
+            <td>初級〜中級（スマホ利用は日常的）</td>
+          </tr>
+          <tr>
+            <td>利用環境</td>
+            <td>事業所PC、タブレット、個人スマートフォン</td>
+          </tr>
+          <tr>
+            <td>主な課題</td>
+            <td>書類作成の負担、移動中の記録、情報共有</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header">ペルソナ1: 田中 美咲（45歳）</div>
+        <div class="card-body">
+          <p><strong>職種:</strong> 主任介護支援専門員</p>
+          <p><strong>経験:</strong> 15年</p>
+          <p><strong>担当件数:</strong> 35件</p>
+          <h4>課題</h4>
+          <ul>
+            <li>訪問の合間に記録を書く時間がない</li>
+            <li>担当者会議の調整に時間がかかる</li>
+            <li>紙の記録を後でPCに転記するのが二度手間</li>
+          </ul>
+          <h4>ニーズ</h4>
+          <p class="alert alert-info">移動中にスマホで簡単に記録したい</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">ペルソナ2: 鈴木 健一（58歳）</div>
+        <div class="card-body">
+          <p><strong>職種:</strong> 介護支援専門員</p>
+          <p><strong>経験:</strong> 8年</p>
+          <p><strong>担当件数:</strong> 28件</p>
+          <h4>課題</h4>
+          <ul>
+            <li>ITが苦手、複雑な操作は覚えられない</li>
+            <li>小さい文字が見づらい</li>
+            <li>既存ソフトの操作が複雑</li>
+          </ul>
+          <h4>ニーズ</h4>
+          <p class="alert alert-info">シンプルで見やすいUI</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PRD FEATURES ==================== -->
+  <section id="prd-features" class="section">
+    <div class="section-header">
+      <h2>機能要件</h2>
+      <p>PRD - Phase 1 機能一覧</p>
+    </div>
+
+    <div class="alert alert-warning">
+      <strong>優先度の定義</strong><br>
+      <span class="badge priority-must">Must</span> 必須。MVPに含める<br>
+      <span class="badge priority-should">Should</span> 重要。可能な限り含める<br>
+      <span class="badge priority-could">Could</span> あると良い。時間があれば
+    </div>
+  </section>
+
+  <!-- ==================== PRD F5 ==================== -->
+  <section id="prd-f5" class="section">
+    <div class="section-header">
+      <h2>★ 支援経過記録（第5表）</h2>
+      <p>PRD - 最優先機能</p>
+    </div>
+
+    <div class="alert alert-success">
+      <strong>概要</strong><br>
+      介護支援専門員が専門職として残す記録。利用者・家族、サービス担当者、関係機関との関わりを通じて把握・判断した内容を記録する。
+    </div>
+
+    <div class="card">
+      <div class="card-header">機能一覧</div>
+      <div class="card-body">
+        <table>
+          <tr>
+            <th>ID</th>
+            <th>機能</th>
+            <th>説明</th>
+            <th>優先度</th>
+          </tr>
+          <tr>
+            <td>F5-001</td>
+            <td>記録作成</td>
+            <td>日時、区分、内容を入力して記録を作成</td>
+            <td><span class="badge priority-must">Must</span></td>
+          </tr>
+          <tr>
+            <td>F5-002</td>
+            <td>詳細記録</td>
+            <td>関係機関、判断、家族意見の入力（詳細版対応）</td>
+            <td><span class="badge priority-must">Must</span></td>
+          </tr>
+          <tr>
+            <td>F5-003</td>
+            <td>記録一覧</td>
+            <td>利用者別の記録を時系列で表示</td>
+            <td><span class="badge priority-must">Must</span></td>
+          </tr>
+          <tr>
+            <td>F5-004</td>
+            <td>検索・フィルタ</td>
+            <td>日付範囲、区分、キーワードで絞り込み</td>
+            <td><span class="badge priority-must">Must</span></td>
+          </tr>
+          <tr>
+            <td>F5-005</td>
+            <td>記録編集</td>
+            <td>既存記録の編集・削除</td>
+            <td><span class="badge priority-must">Must</span></td>
+          </tr>
+          <tr>
+            <td>F5-006</td>
+            <td>テンプレート</td>
+            <td>定型文の登録・呼び出し</td>
+            <td><span class="badge priority-should">Should</span></td>
+          </tr>
+          <tr>
+            <td>F5-007</td>
+            <td>音声入力</td>
+            <td>音声認識によるテキスト入力</td>
+            <td><span class="badge priority-should">Should</span></td>
+          </tr>
+          <tr>
+            <td>F5-008</td>
+            <td>PDF出力</td>
+            <td>厚労省様式でのPDF出力</td>
+            <td><span class="badge priority-must">Must</span></td>
+          </tr>
+          <tr>
+            <td>F5-009</td>
+            <td>一括印刷</td>
+            <td>期間指定での一括PDF出力</td>
+            <td><span class="badge priority-should">Should</span></td>
+          </tr>
+          <tr>
+            <td>F5-010</td>
+            <td>添付ファイル</td>
+            <td>写真・文書の添付</td>
+            <td><span class="badge priority-could">Could</span></td>
+          </tr>
+          <tr style="background: #ecfdf5;">
+            <td>F5-011</td>
+            <td><strong>Googleカレンダー連携</strong></td>
+            <td>記録をGoogleカレンダーに保存・同期</td>
+            <td><span class="badge priority-must">Must</span></td>
+          </tr>
+          <tr style="background: #ecfdf5;">
+            <td>F5-012</td>
+            <td><strong>Googleカレンダー検索</strong></td>
+            <td>Googleカレンダー上で記録を検索・閲覧</td>
+            <td><span class="badge priority-must">Must</span></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="border: 2px solid #10b981;">
+      <div class="card-header" style="background: #ecfdf5; color: #047857;">
+        Googleカレンダー連携仕様【重要】
+      </div>
+      <div class="card-body">
+        <div class="alert alert-success">
+          <strong>データストレージ方針</strong><br>
+          支援経過記録は<strong>Googleカレンダーをプライマリデータストア</strong>として使用する。<br>
+          最終的なデータは全てGoogleカレンダー上に残り、Googleカレンダーで検索・閲覧が可能。
+        </div>
+
+        <h4>連携仕様</h4>
+        <table>
+          <tr>
+            <th style="width: 180px;">項目</th>
+            <th>仕様</th>
+          </tr>
+          <tr>
+            <td>認証方式</td>
+            <td>OAuth 2.0（ユーザーごとのGoogleアカウント連携）</td>
+          </tr>
+          <tr>
+            <td>カレンダー</td>
+            <td>ユーザーごとに専用カレンダー<code>KaigoIDE_支援経過記録</code>を自動作成</td>
+          </tr>
+          <tr>
+            <td>データ形式</td>
+            <td>Googleカレンダーイベント + Extended Properties</td>
+          </tr>
+          <tr>
+            <td>検索機能</td>
+            <td>Googleカレンダーの検索機能を活用</td>
+          </tr>
+          <tr>
+            <td>閲覧方法</td>
+            <td>KaigoIDE / Googleカレンダーアプリ 両方で閲覧可能</td>
+          </tr>
+        </table>
+
+        <h4>イベントマッピング</h4>
+        <table>
+          <tr>
+            <th>Googleカレンダー項目</th>
+            <th>支援経過記録データ</th>
+          </tr>
+          <tr>
+            <td>タイトル（summary）</td>
+            <td><code>[区分] 利用者名様</code></td>
+          </tr>
+          <tr>
+            <td>本文（description）</td>
+            <td>記録内容</td>
+          </tr>
+          <tr>
+            <td>開始日時</td>
+            <td>記録日時</td>
+          </tr>
+          <tr>
+            <td>拡張プロパティ</td>
+            <td>利用者ID、区分コード、関係機関、判断、家族意見</td>
+          </tr>
+        </table>
+
+        <h4>メリット</h4>
+        <ul>
+          <li>外出先でGoogleカレンダーアプリから記録を確認可能</li>
+          <li>Googleの強力な検索機能で過去の記録を素早く検索</li>
+          <li>ユーザー自身のGoogleアカウントにデータが残る（データオーナーシップ）</li>
+          <li>スマートフォンへのプッシュ通知対応</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">データ構造（Googleカレンダーイベント形式）</div>
+      <div class="card-body">
+        <pre>
+// Googleカレンダーイベントへのマッピング
+interface CareRecordEvent {
+  // === 標準フィールド ===
+  summary: string;              // "[訪問] 山田太郎様"
+  description: string;          // 記録内容（本文）
+  start: {
+    dateTime: string;           // 記録日時
+    timeZone: 'Asia/Tokyo';
+  };
+  end: {
+    dateTime: string;           // 記録日時 + 30分
+    timeZone: 'Asia/Tokyo';
+  };
+
+  // === 拡張プロパティ（カスタムデータ）===
+  extendedProperties: {
+    private: {
+      kaigoide_type: 'care_record';    // レコード識別子
+      kaigoide_version: '1';           // データバージョン
+      client_id: string;               // 利用者ID
+      client_name: string;             // 利用者名
+      category: RecordCategory;        // 区分
+      related_org?: string;            // 関係機関
+      judgment?: string;               // 判断
+      family_opinion?: string;         // 家族意見
+    }
+  }
+}
+
+enum RecordCategory {
+  VISIT = '訪問',
+  PHONE = '電話',
+  FAX = 'FAX',
+  MAIL = 'メール',
+  CONFERENCE = '会議',
+  OTHER = 'その他'
+}</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">画面イメージ（ワイヤーフレーム）</div>
+      <div class="card-body">
+        <div class="diagram">┌─────────────────────────────────────────────────────┐
+│ 支援経過記録（第5表）                    [+ 新規作成]  │
+├─────────────────────────────────────────────────────┤
+│ [利用者選択 ▼] [期間: 2024/01 - 2024/12] [検索...]   │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│  ◉ 2024/01/15 10:30  [訪問]                        │
+│  ├─ 自宅訪問。体調確認。血圧正常。                   │
+│  │  【判断】サービス継続で問題なし                   │
+│  │                                                 │
+│  ◉ 2024/01/10 14:00  [電話]                        │
+│  ├─ 〇〇デイサービスより連絡。                      │
+│  │  利用者の歩行状態について報告あり。               │
+│  │                                                 │
+│  ◉ 2024/01/05 09:00  [会議]                        │
+│  └─ サービス担当者会議を開催...                      │
+│                                                     │
+└─────────────────────────────────────────────────────┘</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PRD F4 ==================== -->
+  <section id="prd-f4" class="section">
+    <div class="section-header">
+      <h2>★ 担当者会議記録（第4表）</h2>
+      <p>PRD - 最優先機能</p>
+    </div>
+
+    <div class="alert alert-success">
+      <strong>概要</strong><br>
+      サービス担当者会議の開催記録。会議の要点、検討内容、結論を記録する。<br>
+      <strong>Googleカレンダー連携対象</strong> - ケアプラン（第1表・第2表）の作成日に紐づけて保存。
+    </div>
+
+    <div class="card" style="border: 2px solid #10b981;">
+      <div class="card-header" style="background: #ecfdf5; color: #047857;">
+        Googleカレンダー連携仕様【重要】
+      </div>
+      <div class="card-body">
+        <div class="alert alert-info">
+          <strong>日付の紐づけ</strong><br>
+          担当者会議のカレンダー上の日付は<strong>「紐づくケアプラン（第1表・第2表）の作成日」</strong>とする。<br>
+          これにより、ケアプラン作成の履歴がカレンダー上で可視化される。
+        </div>
+
+        <h4>連携仕様</h4>
+        <table>
+          <tr>
+            <th style="width: 180px;">項目</th>
+            <th>仕様</th>
+          </tr>
+          <tr>
+            <td>カレンダー名</td>
+            <td><code>KaigoIDE_担当者会議</code>（支援経過記録とは別カレンダー）</td>
+          </tr>
+          <tr>
+            <td>イベント日付</td>
+            <td><strong>ケアプラン作成日</strong>（終日イベント）</td>
+          </tr>
+          <tr>
+            <td>タイトル形式</td>
+            <td><code>[開催目的] 利用者名様 担当者会議</code></td>
+          </tr>
+          <tr>
+            <td>本文</td>
+            <td>結論 + 出席者・議題（JSON形式）</td>
+          </tr>
+          <tr>
+            <td>PDF出力</td>
+            <td><strong>厚労省第4表様式</strong>でダウンロード可能</td>
+          </tr>
+        </table>
+
+        <h4>Googleカレンダー表示イメージ</h4>
+        <div class="diagram" style="font-size: 0.75rem;">
+┌─────────────────── 2024年1月 ───────────────────┐
+│ 日  月  火  水  木  金  土                       │
+│                 1   2   3   4                   │
+│                         ▼                       │
+│                    [新規] 山田太郎様             │
+│                    担当者会議                    │
+│                    ← ケアプラン作成日            │
+│ 5   6   7   8   9  10  11                       │
+│ ▼                                               │
+│ [更新] 佐藤花子様                                │
+│ 担当者会議                                       │
+└─────────────────────────────────────────────────┘</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">機能一覧</div>
+      <div class="card-body">
+        <table>
+          <tr>
+            <th>ID</th>
+            <th>機能</th>
+            <th>説明</th>
+            <th>優先度</th>
+          </tr>
+          <tr>
+            <td>F4-001</td>
+            <td>会議作成</td>
+            <td>日時、場所、目的を入力して会議記録作成</td>
+            <td><span class="badge priority-must">Must</span></td>
+          </tr>
+          <tr>
+            <td>F4-002</td>
+            <td>出席者管理</td>
+            <td>サービス事業所マスタから出席者を選択</td>
+            <td><span class="badge priority-must">Must</span></td>
+          </tr>
+          <tr>
+            <td>F4-003</td>
+            <td>欠席者照会</td>
+            <td>欠席者への事前照会内容を記録</td>
+            <td><span class="badge priority-must">Must</span></td>
+          </tr>
+          <tr>
+            <td>F4-004</td>
+            <td>議題管理</td>
+            <td>検討項目、検討内容、決定事項の入力</td>
+            <td><span class="badge priority-must">Must</span></td>
+          </tr>
+          <tr>
+            <td>F4-005</td>
+            <td>結論入力</td>
+            <td>会議の結論、今後の対応を記録</td>
+            <td><span class="badge priority-must">Must</span></td>
+          </tr>
+          <tr>
+            <td>F4-006</td>
+            <td>会議一覧</td>
+            <td>利用者別の会議記録を一覧表示</td>
+            <td><span class="badge priority-must">Must</span></td>
+          </tr>
+          <tr>
+            <td>F4-007</td>
+            <td>PDF出力</td>
+            <td>厚労省様式でのPDF出力</td>
+            <td><span class="badge priority-must">Must</span></td>
+          </tr>
+          <tr>
+            <td>F4-008</td>
+            <td>議題テンプレート</td>
+            <td>よく使う議題のテンプレート</td>
+            <td><span class="badge priority-should">Should</span></td>
+          </tr>
+          <tr>
+            <td>F4-009</td>
+            <td>リマインダー</td>
+            <td>会議開催前の通知</td>
+            <td><span class="badge priority-could">Could</span></td>
+          </tr>
+          <tr>
+            <td>F4-010</td>
+            <td>開催通知送信</td>
+            <td>メール/FAXでの開催通知</td>
+            <td><span class="badge priority-could">Could</span></td>
+          </tr>
+          <tr style="background: #ecfdf5;">
+            <td>F4-011</td>
+            <td><strong>Googleカレンダー連携</strong></td>
+            <td>会議記録をGoogleカレンダーに保存</td>
+            <td><span class="badge priority-must">Must</span></td>
+          </tr>
+          <tr style="background: #ecfdf5;">
+            <td>F4-012</td>
+            <td><strong>ケアプラン紐づけ</strong></td>
+            <td>第1表・第2表の作成日に紐づけて配置</td>
+            <td><span class="badge priority-must">Must</span></td>
+          </tr>
+          <tr style="background: #ecfdf5;">
+            <td>F4-013</td>
+            <td><strong>第4表PDF出力</strong></td>
+            <td>厚労省標準様式でPDFダウンロード</td>
+            <td><span class="badge priority-must">Must</span></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">データ構造（Googleカレンダーイベント形式）</div>
+      <div class="card-body">
+        <pre>
+// Googleカレンダーイベントへのマッピング
+interface ConferenceEvent {
+  // === 標準フィールド ===
+  summary: string;              // "[新規] 山田太郎様 担当者会議"
+  description: string;          // 結論 + JSON(出席者・議題)
+  start: { date: string };      // ★ケアプラン作成日（終日イベント）
+  end: { date: string };        // ★ケアプラン作成日
+
+  // === 拡張プロパティ ===
+  extendedProperties: {
+    private: {
+      kaigoide_type: 'conference';
+      kaigoide_version: '1';
+      client_id: string;               // 利用者ID
+      client_name: string;             // 利用者名
+      plan_id: string;                 // ★紐づくケアプランID
+      plan_created_date: string;       // ★ケアプラン作成日
+      conference_date: string;         // 実際の会議開催日
+      purpose: ConferencePurpose;      // 開催目的
+      venue: string;                   // 開催場所
+      conclusion: string;              // 結論（1024文字まで）
+    }
+  }
+}
+
+// 本文(description)に格納するJSON
+interface ConferenceDescription {
+  attendees: Attendee[];        // 出席者一覧
+  absentees: Absentee[];        // 欠席者（照会）
+  agendaItems: AgendaItem[];    // 検討項目
+  nextActions?: string;         // 今後の対応
+}
+
+enum ConferencePurpose {
+  NEW_PLAN = '新規ケアプラン作成',
+  PLAN_CHANGE = 'ケアプラン変更',
+  RENEWAL = '更新認定',
+  CATEGORY_CHANGE = '区分変更',
+  URGENT = '緊急対応',
+  OTHER = 'その他'
+}</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">ケアプラン（第1表・第2表）参照データ</div>
+      <div class="card-body">
+        <div class="alert alert-info">
+          担当者会議は必ず<strong>ケアプラン（第1表・第2表）</strong>に紐づく。<br>
+          ケアプラン自体はPhase 2で実装予定だが、IDと作成日は先行して管理する。
+        </div>
+        <pre>
+// ケアプラン参照データ（Phase 1では簡易版）
+interface CarePlanRef {
+  id: string;                 // plan_id（自動採番）
+  clientId: string;           // 利用者ID
+  createdDate: Date;          // ★作成日（担当者会議の配置日に使用）
+  purpose: ConferencePurpose; // 作成目的（新規/変更/更新等）
+  version: number;            // 版数
+}
+
+// Phase 2以降で追加
+interface CarePlanFull extends CarePlanRef {
+  // 第1表
+  clientIntention: string;    // 利用者及び家族の意向
+  overallPolicy: string;      // 総合的な援助の方針
+  // 第2表
+  needs: Need[];              // 生活全般の解決すべき課題
+}</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">画面イメージ（ワイヤーフレーム）</div>
+      <div class="card-body">
+        <div class="diagram">┌─────────────────────────────────────────────────────┐
+│ サービス担当者会議の要点（第4表）         [+ 新規作成] │
+├─────────────────────────────────────────────────────┤
+│ 【基本情報】                                         │
+│ 利用者: [山田 太郎 ▼]  開催日: [2024/01/15]          │
+│ 開催場所: [利用者自宅        ]                       │
+│ 開催目的: [● 新規  ○ 変更  ○ 更新  ○ その他]        │
+├─────────────────────────────────────────────────────┤
+│ 【出席者】                           [+ 追加]        │
+│ ┌──────────────────────────────────────────────┐    │
+│ │ ☑ 山田 花子（妻）    - 家族                   │    │
+│ │ ☑ 佐藤 一郎         - 〇〇訪問介護 / サ責     │    │
+│ │ ☑ 田中 美咲         - △△デイサービス / 相談員 │    │
+│ │ ☐ 鈴木 健太（照会） - □□訪問看護 / 看護師    │    │
+│ └──────────────────────────────────────────────┘    │
+├─────────────────────────────────────────────────────┤
+│ 【検討項目】                         [+ 追加]        │
+│ 1. [現在の身体状況について                    ]      │
+│    → [歩行時のふらつきが増加。転倒リスクあり... ]    │
+│                                                     │
+│ 2. [サービス内容の変更について                ]      │
+│    → [週2回→週3回への増回を検討...             ]    │
+├─────────────────────────────────────────────────────┤
+│ 【結論】                                             │
+│ [                                                 ] │
+│                                                     │
+│              [下書き保存]  [PDF出力]  [保存]         │
+└─────────────────────────────────────────────────────┘</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PRD CAREPLAN SIMPLE ==================== -->
+  <section id="prd-careplan" class="section">
+    <div class="section-header">
+      <h2>★ ケアプラン簡易管理（Phase 1限定）</h2>
+      <p>PRD - 担当者会議（第4表）紐づけ用の最小限機能</p>
+    </div>
+
+    <div class="alert alert-info" style="margin-bottom: 2rem;">
+      <strong>目的:</strong> 担当者会議（第4表）をケアプラン作成日に紐づけるための最小限機能。<br>
+      <strong>注意:</strong> 第1表・第2表の内容（利用者意向、援助方針、目標等）はPhase 2で実装。
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header">Phase 1 機能</div>
+        <div class="card-body">
+          <table>
+            <tr>
+              <th>ID</th>
+              <th>機能</th>
+              <th>説明</th>
+            </tr>
+            <tr>
+              <td>FP-001</td>
+              <td>プラン作成</td>
+              <td>利用者に紐づくプラン（作成日・版数）を登録</td>
+            </tr>
+            <tr>
+              <td>FP-002</td>
+              <td>プラン一覧</td>
+              <td>利用者ごとのプラン履歴を一覧表示</td>
+            </tr>
+            <tr>
+              <td>FP-003</td>
+              <td>プラン選択</td>
+              <td>担当者会議作成時にプランを選択</td>
+            </tr>
+            <tr>
+              <td>FP-004</td>
+              <td>ステータス管理</td>
+              <td>下書き/有効/アーカイブの状態管理</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">データモデル</div>
+        <div class="card-body">
+<pre style="background: var(--bg-code); padding: 1rem; font-size: 0.8rem; overflow-x: auto;">
+interface CarePlanSimple {
+  id: string;           // プランID（UUID）
+  clientId: string;     // 利用者ID
+  createdDate: Date;    // ★作成日
+                        // （担当者会議の配置日に使用）
+  version: number;      // 版数（1, 2, 3...）
+  purpose: PlanPurpose; // 目的
+  status: Status;       // 状態
+  memo?: string;        // 備考（任意）
+}
+
+type PlanPurpose =
+  | 'new'          // 新規作成
+  | 'change'       // 変更
+  | 'renewal'      // 更新
+  | 'level_change' // 区分変更
+
+type Status =
+  | 'draft'     // 下書き
+  | 'active'    // 有効
+  | 'archived'  // アーカイブ
+</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 1rem;">
+      <div class="card-header">運用フロー</div>
+      <div class="card-body">
+<pre style="background: var(--bg-code); padding: 1rem;">
+┌─────────────────────────────────────────────────────────────────────┐
+│ 1. 利用者詳細画面                                                    │
+│    └─► 「新規プラン作成」ボタンをクリック                             │
+│                                                                     │
+│ 2. プラン作成ダイアログ                                              │
+│    ├─ 作成日: [2024/01/05] （★この日付が担当者会議の配置日になる）   │
+│    ├─ 版数:   [1] （自動採番または手動）                             │
+│    └─ 目的:   [新規作成 ▼]                                          │
+│                                                                     │
+│ 3. 担当者会議作成画面                                                │
+│    ├─ 紐づくプラン: [2024/01/05 作成 第1版 (新規作成) ▼]             │
+│    │                                                                │
+│    └─► Googleカレンダーには「2024/01/05」に終日イベントとして配置    │
+└─────────────────────────────────────────────────────────────────────┘
+</pre>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 1rem;">
+      <div class="card-header">ケアプランと担当者会議の関係</div>
+      <div class="card-body">
+<pre style="background: var(--bg-code); padding: 1rem;">
+利用者: 山田太郎様
+│
+├─► ケアプラン（簡易）
+│   │
+│   ├─ 第1版 (2024/01/05作成・新規) ────► 担当者会議A
+│   │                                     └─ カレンダー: 01/05に配置
+│   │
+│   ├─ 第2版 (2024/04/01作成・更新) ────► 担当者会議B
+│   │                                     └─ カレンダー: 04/01に配置
+│   │
+│   └─ 第3版 (2024/07/15作成・変更) ────► 担当者会議C
+│                                         └─ カレンダー: 07/15に配置
+│
+└─► 支援経過記録（第5表）
+    └─ 記録日時でカレンダーに配置（プランとは独立）
+</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PRD NFR ==================== -->
+  <section id="prd-nfr" class="section">
+    <div class="section-header">
+      <h2>非機能要件</h2>
+      <p>PRD - パフォーマンス、セキュリティ、可用性</p>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header">パフォーマンス</div>
+        <div class="card-body">
+          <table>
+            <tr>
+              <th>項目</th>
+              <th>要件</th>
+            </tr>
+            <tr>
+              <td>ページ読み込み時間</td>
+              <td>初回: 3秒以内<br>2回目以降: 1秒以内</td>
+            </tr>
+            <tr>
+              <td>API応答時間</td>
+              <td>95パーセンタイルで500ms以内</td>
+            </tr>
+            <tr>
+              <td>同時接続数</td>
+              <td>1事業所あたり20ユーザー</td>
+            </tr>
+            <tr>
+              <td>データ保持期間</td>
+              <td>最低5年（介護保険法に準拠）</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">可用性</div>
+        <div class="card-body">
+          <table>
+            <tr>
+              <th>項目</th>
+              <th>要件</th>
+            </tr>
+            <tr>
+              <td>稼働率</td>
+              <td>99.5%以上<br>（月間約3.6時間以内の停止）</td>
+            </tr>
+            <tr>
+              <td>計画停止</td>
+              <td>事前通知の上、月1回まで</td>
+            </tr>
+            <tr>
+              <td>RTO（目標復旧時間）</td>
+              <td>4時間以内</td>
+            </tr>
+            <tr>
+              <td>RPO（目標復旧時点）</td>
+              <td>1時間以内</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">セキュリティ</div>
+        <div class="card-body">
+          <table>
+            <tr>
+              <th>項目</th>
+              <th>要件</th>
+            </tr>
+            <tr>
+              <td>通信暗号化</td>
+              <td>TLS 1.2以上必須</td>
+            </tr>
+            <tr>
+              <td>データ暗号化</td>
+              <td>保存データはAES-256で暗号化</td>
+            </tr>
+            <tr>
+              <td>認証</td>
+              <td>パスワードポリシー<br>（8文字以上、英数記号混在）</td>
+            </tr>
+            <tr>
+              <td>セッション</td>
+              <td>30分無操作でタイムアウト</td>
+            </tr>
+            <tr>
+              <td>監査ログ</td>
+              <td>全操作のログを1年間保持</td>
+            </tr>
+            <tr>
+              <td>脆弱性対策</td>
+              <td>OWASP Top 10対応</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">ユーザビリティ</div>
+        <div class="card-body">
+          <table>
+            <tr>
+              <th>項目</th>
+              <th>要件</th>
+            </tr>
+            <tr>
+              <td>対応ブラウザ</td>
+              <td>Chrome, Safari, Edge, Firefox<br>（最新版）</td>
+            </tr>
+            <tr>
+              <td>レスポンシブ対応</td>
+              <td>320px〜2560px</td>
+            </tr>
+            <tr>
+              <td>アクセシビリティ</td>
+              <td>WCAG 2.1 AA準拠</td>
+            </tr>
+            <tr>
+              <td>言語</td>
+              <td>日本語のみ（初期リリース）</td>
+            </tr>
+            <tr>
+              <td>フォントサイズ</td>
+              <td>拡大表示オプション（最大200%）</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SDD ARCHITECTURE ==================== -->
+  <section id="sdd-architecture" class="section">
+    <div class="section-header">
+      <h2>システムアーキテクチャ</h2>
+      <p>SDD - 全体構成</p>
+    </div>
+
+    <div class="card">
+      <div class="card-header">アーキテクチャ図</div>
+      <div class="card-body">
+        <div class="diagram">┌─────────────────────────────────────────────────────────────────────┐
+│                          クライアント層                              │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │
+│  │   Browser    │  │   Tablet     │  │ Smartphone   │              │
+│  │   (PC)       │  │   (PWA)      │  │   (PWA)      │              │
+│  └──────────────┘  └──────────────┘  └──────────────┘              │
+│           │                │                │                       │
+│           └────────────────┼────────────────┘                       │
+│                            ▼                                        │
+│                   ┌─────────────────┐                               │
+│                   │   React SPA     │                               │
+│                   │  (TypeScript)   │                               │
+│                   └─────────────────┘                               │
+└─────────────────────────────────────────────────────────────────────┘
+                             │ HTTPS
+                             ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                          API Gateway                                │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │  - 認証 (JWT検証)                                            │   │
+│  │  - レート制限                                                 │   │
+│  │  - ロギング                                                   │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                       アプリケーション層                             │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                    NestJS Application                        │   │
+│  │  ┌───────────┐ ┌───────────┐ ┌───────────┐ ┌───────────┐   │   │
+│  │  │   Auth    │ │  Client   │ │   Care    │ │Conference │   │   │
+│  │  │  Module   │ │  Module   │ │  Record   │ │  Module   │   │   │
+│  │  └───────────┘ └───────────┘ └───────────┘ └───────────┘   │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│              ┌─────────────┼─────────────┐                         │
+│              ▼             ▼             ▼                         │
+│       ┌───────────┐ ┌───────────┐ ┌───────────┐                   │
+│       │  Prisma   │ │   Redis   │ │    S3     │                   │
+│       │   ORM     │ │  Cache    │ │  Storage  │                   │
+│       └───────────┘ └───────────┘ └───────────┘                   │
+└─────────────────────────────────────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                         データ層                                     │
+│  ┌───────────────────┐  ┌───────────────────┐                      │
+│  │    PostgreSQL     │  │   Redis Cluster   │                      │
+│  │   (Primary DB)    │  │  (Cache/Session)  │                      │
+│  └───────────────────┘  └───────────────────┘                      │
+└─────────────────────────────────────────────────────────────────────┘</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SDD TECH STACK ==================== -->
+  <section id="sdd-tech-stack" class="section">
+    <div class="section-header">
+      <h2>技術スタック</h2>
+      <p>SDD - 採用技術一覧</p>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header">フロントエンド</div>
+        <div class="card-body">
+          <table>
+            <tr>
+              <th>技術</th>
+              <th>用途</th>
+            </tr>
+            <tr>
+              <td><strong>React 18</strong></td>
+              <td>UIライブラリ</td>
+            </tr>
+            <tr>
+              <td><strong>TypeScript 5</strong></td>
+              <td>型安全な開発</td>
+            </tr>
+            <tr>
+              <td><strong>Vite</strong></td>
+              <td>ビルドツール</td>
+            </tr>
+            <tr>
+              <td><strong>TanStack Query</strong></td>
+              <td>サーバー状態管理</td>
+            </tr>
+            <tr>
+              <td><strong>Zustand</strong></td>
+              <td>クライアント状態管理</td>
+            </tr>
+            <tr>
+              <td><strong>React Router v6</strong></td>
+              <td>ルーティング</td>
+            </tr>
+            <tr>
+              <td><strong>Tailwind CSS</strong></td>
+              <td>スタイリング</td>
+            </tr>
+            <tr>
+              <td><strong>shadcn/ui</strong></td>
+              <td>UIコンポーネント</td>
+            </tr>
+            <tr>
+              <td><strong>React Hook Form</strong></td>
+              <td>フォーム管理</td>
+            </tr>
+            <tr>
+              <td><strong>Zod</strong></td>
+              <td>バリデーション</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">バックエンド</div>
+        <div class="card-body">
+          <table>
+            <tr>
+              <th>技術</th>
+              <th>用途</th>
+            </tr>
+            <tr>
+              <td><strong>NestJS 10</strong></td>
+              <td>Webフレームワーク</td>
+            </tr>
+            <tr>
+              <td><strong>TypeScript 5</strong></td>
+              <td>型安全な開発</td>
+            </tr>
+            <tr>
+              <td><strong>Prisma 5</strong></td>
+              <td>ORM</td>
+            </tr>
+            <tr>
+              <td><strong>PostgreSQL 16</strong></td>
+              <td>メインDB</td>
+            </tr>
+            <tr>
+              <td><strong>Redis 7</strong></td>
+              <td>キャッシュ・セッション</td>
+            </tr>
+            <tr>
+              <td><strong>Passport</strong></td>
+              <td>認証</td>
+            </tr>
+            <tr>
+              <td><strong>class-validator</strong></td>
+              <td>バリデーション</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">インフラ・DevOps</div>
+        <div class="card-body">
+          <table>
+            <tr>
+              <th>技術</th>
+              <th>用途</th>
+            </tr>
+            <tr>
+              <td><strong>Docker</strong></td>
+              <td>コンテナ化</td>
+            </tr>
+            <tr>
+              <td><strong>AWS / GCP / Azure</strong></td>
+              <td>クラウドインフラ</td>
+            </tr>
+            <tr>
+              <td><strong>GitHub Actions</strong></td>
+              <td>CI/CD</td>
+            </tr>
+            <tr>
+              <td><strong>pnpm</strong></td>
+              <td>パッケージ管理</td>
+            </tr>
+            <tr>
+              <td><strong>Turborepo</strong></td>
+              <td>モノレポ管理</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">テスト</div>
+        <div class="card-body">
+          <table>
+            <tr>
+              <th>技術</th>
+              <th>用途</th>
+            </tr>
+            <tr>
+              <td><strong>Vitest</strong></td>
+              <td>ユニットテスト（FE）</td>
+            </tr>
+            <tr>
+              <td><strong>Testing Library</strong></td>
+              <td>コンポーネントテスト</td>
+            </tr>
+            <tr>
+              <td><strong>Jest</strong></td>
+              <td>ユニットテスト（BE）</td>
+            </tr>
+            <tr>
+              <td><strong>Playwright</strong></td>
+              <td>E2Eテスト</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SDD FRONTEND ==================== -->
+  <section id="sdd-frontend" class="section">
+    <div class="section-header">
+      <h2>フロントエンド設計</h2>
+      <p>SDD - ディレクトリ構造とコンポーネント設計</p>
+    </div>
+
+    <div class="card">
+      <div class="card-header">ディレクトリ構造</div>
+      <div class="card-body">
+        <pre>
+apps/web/src/
+├── app/                          # アプリケーションエントリー
+│   ├── App.tsx
+│   ├── routes.tsx                # ルーティング定義
+│   └── providers.tsx             # プロバイダー設定
+│
+├── features/                     # 機能モジュール（Feature-Sliced Design）
+│   ├── care-record/              # 支援経過記録（第5表）
+│   │   ├── components/           # UIコンポーネント
+│   │   ├── hooks/                # カスタムフック
+│   │   ├── api/                  # API呼び出し
+│   │   ├── types/                # 型定義
+│   │   └── index.ts              # Public API
+│   │
+│   ├── conference/               # 担当者会議（第4表）
+│   ├── client/                   # 利用者管理
+│   └── auth/                     # 認証
+│
+├── shared/                       # 共有リソース
+│   ├── components/               # 共通UIコンポーネント
+│   ├── hooks/                    # 共通フック
+│   ├── lib/                      # ライブラリ設定
+│   └── utils/                    # ユーティリティ
+│
+└── styles/                       # グローバルスタイル</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">状態管理の分類</div>
+      <div class="card-body">
+        <table>
+          <tr>
+            <th>状態タイプ</th>
+            <th>管理方法</th>
+            <th>例</th>
+          </tr>
+          <tr>
+            <td>サーバー状態</td>
+            <td><code>TanStack Query</code></td>
+            <td>利用者一覧、記録データ</td>
+          </tr>
+          <tr>
+            <td>グローバルUI状態</td>
+            <td><code>Zustand</code></td>
+            <td>サイドバー開閉、テーマ</td>
+          </tr>
+          <tr>
+            <td>ローカル状態</td>
+            <td><code>useState / useReducer</code></td>
+            <td>フォーム入力、モーダル</td>
+          </tr>
+          <tr>
+            <td>URL状態</td>
+            <td><code>React Router</code></td>
+            <td>ページ、検索条件</td>
+          </tr>
+          <tr>
+            <td>フォーム状態</td>
+            <td><code>React Hook Form</code></td>
+            <td>入力値、バリデーション</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SDD BACKEND ==================== -->
+  <section id="sdd-backend" class="section">
+    <div class="section-header">
+      <h2>バックエンド設計</h2>
+      <p>SDD - モジュール構成とレイヤー</p>
+    </div>
+
+    <div class="card">
+      <div class="card-header">レイヤードアーキテクチャ</div>
+      <div class="card-body">
+        <div class="diagram">┌─────────────────────────────────────────┐
+│           Controller Layer              │  ← HTTPリクエスト/レスポンス
+├─────────────────────────────────────────┤
+│            Service Layer                │  ← ビジネスロジック
+├─────────────────────────────────────────┤
+│          Repository Layer               │  ← データアクセス
+├─────────────────────────────────────────┤
+│              Prisma ORM                 │  ← DB操作
+└─────────────────────────────────────────┘</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">モジュール構成</div>
+      <div class="card-body">
+        <pre>
+services/api/src/
+├── main.ts                       # エントリーポイント
+├── app.module.ts                 # ルートモジュール
+│
+├── modules/                      # 機能モジュール
+│   ├── auth/                     # 認証
+│   │   ├── auth.module.ts
+│   │   ├── auth.controller.ts
+│   │   ├── auth.service.ts
+│   │   ├── strategies/           # Passport戦略
+│   │   ├── guards/               # 認証ガード
+│   │   └── dto/                  # データ転送オブジェクト
+│   │
+│   ├── client/                   # 利用者管理
+│   ├── care-record/              # 支援経過記録
+│   └── conference/               # 担当者会議
+│
+├── common/                       # 共通機能
+│   ├── decorators/
+│   ├── filters/
+│   ├── guards/
+│   └── interceptors/
+│
+└── prisma/                       # Prisma
+    ├── schema.prisma
+    └── migrations/</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SDD DATABASE ==================== -->
+  <section id="sdd-database" class="section">
+    <div class="section-header">
+      <h2>データベース設計</h2>
+      <p>SDD - ER図とテーブル定義</p>
+    </div>
+
+    <div class="card">
+      <div class="card-header">ER図（簡略版）</div>
+      <div class="card-body">
+        <div class="diagram">┌─────────────────┐
+│     tenants     │
+│   (事業所)      │
+└────────┬────────┘
+         │
+         │ 1:N
+         ▼
+┌─────────────────┐      ┌─────────────────┐
+│     users       │      │    clients      │
+│   (ユーザー)    │      │   (利用者)      │
+└─────────────────┘      └────────┬────────┘
+                                  │
+                    ┌─────────────┼─────────────┐
+                    │             │             │
+                    ▼             ▼             ▼
+             ┌───────────┐ ┌───────────┐ ┌───────────┐
+             │care_records│ │conferences│ │  (将来)   │
+             │  (第5表)   │ │  (第4表)   │ │ケアプラン等│
+             └───────────┘ └─────┬─────┘ └───────────┘
+                                 │
+                           ┌─────┴─────┐
+                           ▼           ▼
+                    ┌───────────┐ ┌───────────┐
+                    │ attendees │ │agenda_items│
+                    │ (出席者)   │ │  (議題)    │
+                    └───────────┘ └───────────┘</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">主要テーブル定義</div>
+      <div class="card-body">
+        <table>
+          <tr>
+            <th>テーブル</th>
+            <th>説明</th>
+            <th>主要カラム</th>
+          </tr>
+          <tr>
+            <td><code>tenants</code></td>
+            <td>事業所</td>
+            <td>id, name, provider_number</td>
+          </tr>
+          <tr>
+            <td><code>users</code></td>
+            <td>ユーザー</td>
+            <td>id, tenant_id, email, role</td>
+          </tr>
+          <tr>
+            <td><code>clients</code></td>
+            <td>利用者</td>
+            <td>id, tenant_id, name, insured_number, care_level</td>
+          </tr>
+          <tr>
+            <td><code>care_records</code></td>
+            <td>支援経過記録</td>
+            <td>id, client_id, record_date, category, content</td>
+          </tr>
+          <tr>
+            <td><code>conferences</code></td>
+            <td>担当者会議</td>
+            <td>id, client_id, conference_date, venue, purpose</td>
+          </tr>
+          <tr>
+            <td><code>attendees</code></td>
+            <td>出席者</td>
+            <td>id, conference_id, name, organization</td>
+          </tr>
+          <tr>
+            <td><code>agenda_items</code></td>
+            <td>議題</td>
+            <td>id, conference_id, topic, discussion</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SDD API ==================== -->
+  <section id="sdd-api" class="section">
+    <div class="section-header">
+      <h2>API設計</h2>
+      <p>SDD - RESTful APIエンドポイント</p>
+    </div>
+
+    <div class="card">
+      <div class="card-header">認証API</div>
+      <div class="card-body">
+        <table>
+          <tr>
+            <th>メソッド</th>
+            <th>エンドポイント</th>
+            <th>説明</th>
+          </tr>
+          <tr>
+            <td><span class="badge badge-success">POST</span></td>
+            <td><code>/auth/login</code></td>
+            <td>ログイン</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-success">POST</span></td>
+            <td><code>/auth/logout</code></td>
+            <td>ログアウト</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-success">POST</span></td>
+            <td><code>/auth/refresh</code></td>
+            <td>トークンリフレッシュ</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-primary">GET</span></td>
+            <td><code>/auth/me</code></td>
+            <td>現在のユーザー情報</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">支援経過記録API（第5表）</div>
+      <div class="card-body">
+        <table>
+          <tr>
+            <th>メソッド</th>
+            <th>エンドポイント</th>
+            <th>説明</th>
+          </tr>
+          <tr>
+            <td><span class="badge badge-primary">GET</span></td>
+            <td><code>/clients/:clientId/care-records</code></td>
+            <td>記録一覧</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-success">POST</span></td>
+            <td><code>/clients/:clientId/care-records</code></td>
+            <td>記録作成</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-primary">GET</span></td>
+            <td><code>/clients/:clientId/care-records/:id</code></td>
+            <td>記録詳細</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-warning">PATCH</span></td>
+            <td><code>/clients/:clientId/care-records/:id</code></td>
+            <td>記録更新</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-danger">DELETE</span></td>
+            <td><code>/clients/:clientId/care-records/:id</code></td>
+            <td>記録削除</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-primary">GET</span></td>
+            <td><code>/clients/:clientId/care-records/export/pdf</code></td>
+            <td>PDF出力</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">担当者会議API（第4表）</div>
+      <div class="card-body">
+        <table>
+          <tr>
+            <th>メソッド</th>
+            <th>エンドポイント</th>
+            <th>説明</th>
+          </tr>
+          <tr>
+            <td><span class="badge badge-primary">GET</span></td>
+            <td><code>/clients/:clientId/conferences</code></td>
+            <td>会議一覧</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-success">POST</span></td>
+            <td><code>/clients/:clientId/conferences</code></td>
+            <td>会議作成</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-primary">GET</span></td>
+            <td><code>/clients/:clientId/conferences/:id</code></td>
+            <td>会議詳細</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-warning">PATCH</span></td>
+            <td><code>/clients/:clientId/conferences/:id</code></td>
+            <td>会議更新</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-danger">DELETE</span></td>
+            <td><code>/clients/:clientId/conferences/:id</code></td>
+            <td>会議削除</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-primary">GET</span></td>
+            <td><code>/clients/:clientId/conferences/:id/export/pdf</code></td>
+            <td>PDF出力</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== ADR LIST ==================== -->
+  <section id="adr-list" class="section">
+    <div class="section-header">
+      <h2>ADR - アーキテクチャ決定記録</h2>
+      <p>重要な技術決定とその理由</p>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <table>
+          <tr>
+            <th>ID</th>
+            <th>タイトル</th>
+            <th>決定内容</th>
+            <th>ステータス</th>
+          </tr>
+          <tr>
+            <td>ADR-0001</td>
+            <td>フロントエンド技術選定</td>
+            <td><strong>React + TypeScript</strong> を採用</td>
+            <td><span class="badge badge-success">Accepted</span></td>
+          </tr>
+          <tr>
+            <td>ADR-0002</td>
+            <td>リポジトリ構成</td>
+            <td><strong>pnpm + Turborepo</strong> によるモノレポ</td>
+            <td><span class="badge badge-success">Accepted</span></td>
+          </tr>
+          <tr>
+            <td>ADR-0003</td>
+            <td>状態管理</td>
+            <td><strong>TanStack Query + Zustand</strong></td>
+            <td><span class="badge badge-success">Accepted</span></td>
+          </tr>
+          <tr>
+            <td>ADR-0004</td>
+            <td>バックエンドフレームワーク</td>
+            <td><strong>NestJS</strong> を採用</td>
+            <td><span class="badge badge-success">Accepted</span></td>
+          </tr>
+          <tr>
+            <td>ADR-0005</td>
+            <td>データベース</td>
+            <td><strong>PostgreSQL + Prisma</strong></td>
+            <td><span class="badge badge-success">Accepted</span></td>
+          </tr>
+          <tr>
+            <td>ADR-0006</td>
+            <td>認証方式</td>
+            <td><strong>JWT</strong>（Access + Refresh Token）</td>
+            <td><span class="badge badge-success">Accepted</span></td>
+          </tr>
+          <tr style="background: #ecfdf5;">
+            <td>ADR-0007</td>
+            <td><strong>Googleカレンダー連携</strong></td>
+            <td><strong>Googleカレンダーをプライマリストレージ</strong>として採用</td>
+            <td><span class="badge badge-success">Accepted</span></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header">ADR-0001: React + TypeScript</div>
+        <div class="card-body">
+          <h4>決定理由</h4>
+          <ul>
+            <li>最大のエコシステムとコミュニティ</li>
+            <li>TypeScriptによる型安全性</li>
+            <li>PWA対応が容易</li>
+            <li>採用市場が最も大きく人材確保しやすい</li>
+          </ul>
+          <h4>検討した選択肢</h4>
+          <ul>
+            <li>Vue.js + TypeScript</li>
+            <li>Next.js</li>
+            <li>Angular</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">ADR-0003: 状態管理</div>
+        <div class="card-body">
+          <h4>決定理由</h4>
+          <ul>
+            <li>TanStack Query: サーバー状態に特化、キャッシュ自動化</li>
+            <li>Zustand: 学習コスト低、ボイラープレート少</li>
+            <li>各ライブラリが得意な領域に特化</li>
+          </ul>
+          <h4>検討した選択肢</h4>
+          <ul>
+            <li>Redux + RTK Query</li>
+            <li>SWR</li>
+            <li>Jotai</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">ADR-0004: NestJS</div>
+        <div class="card-body">
+          <h4>決定理由</h4>
+          <ul>
+            <li>モジュール構造がKaigoIDEのモジュール分割方針と合致</li>
+            <li>TypeScriptファースト</li>
+            <li>DIコンテナによる高いテスタビリティ</li>
+            <li>OpenAPI自動生成</li>
+          </ul>
+          <h4>検討した選択肢</h4>
+          <ul>
+            <li>Express.js</li>
+            <li>Fastify</li>
+            <li>Hono</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">ADR-0006: JWT認証</div>
+        <div class="card-body">
+          <h4>決定理由</h4>
+          <ul>
+            <li>SPA/PWAでの認証に適している</li>
+            <li>ステートレスでスケーラビリティが高い</li>
+            <li>オフライン対応との整合性</li>
+          </ul>
+          <h4>セキュリティ対策</h4>
+          <ul>
+            <li>Access Token: 15分有効、メモリ保持</li>
+            <li>Refresh Token: 7日有効、HTTP Only Cookie</li>
+            <li>トークンローテーション</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="border: 2px solid #10b981; margin-top: 24px;">
+      <div class="card-header" style="background: #ecfdf5; color: #047857;">
+        ADR-0007: Googleカレンダー連携（第5表・第4表）【重要】
+      </div>
+      <div class="card-body">
+        <h4>決定内容</h4>
+        <p><strong>Googleカレンダーを支援経過記録（第5表）・担当者会議（第4表）のプライマリデータストアとして採用</strong></p>
+
+        <h4>カレンダー構成</h4>
+        <table>
+          <tr>
+            <th>カレンダー</th>
+            <th>対象</th>
+            <th>イベント日付</th>
+          </tr>
+          <tr>
+            <td><code>KaigoIDE_支援経過記録</code></td>
+            <td>第5表</td>
+            <td>記録日時（実際の日時）</td>
+          </tr>
+          <tr>
+            <td><code>KaigoIDE_担当者会議</code></td>
+            <td>第4表</td>
+            <td><strong>ケアプラン作成日</strong></td>
+          </tr>
+        </table>
+
+        <h4>決定理由</h4>
+        <ul>
+          <li>Googleカレンダーで全ての記録が検索・閲覧可能</li>
+          <li>担当者会議をケアプラン作成日に配置→計画作成の履歴が可視化</li>
+          <li>厚労省様式PDF出力でデータ復元可能</li>
+          <li>ユーザー自身のGoogleアカウントにデータが残る</li>
+        </ul>
+
+        <h4>実装方式</h4>
+        <ul>
+          <li>OAuth 2.0でユーザーのGoogleアカウントと連携</li>
+          <li>ユーザーごとに2つの専用カレンダーを作成</li>
+          <li>Extended Propertiesでカスタムデータを保持</li>
+          <li>複雑なデータ（出席者・議題）は本文にJSON格納</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== GLOSSARY ==================== -->
+  <section id="glossary" class="section">
+    <div class="section-header">
+      <h2>用語集</h2>
+      <p>介護保険・業務用語と技術用語</p>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header">介護保険・業務用語</div>
+        <div class="card-body">
+          <table>
+            <tr>
+              <th>用語</th>
+              <th>説明</th>
+            </tr>
+            <tr>
+              <td>居宅介護支援</td>
+              <td>自宅での介護サービス利用のためのケアプラン作成・調整</td>
+            </tr>
+            <tr>
+              <td>介護支援専門員</td>
+              <td>ケアマネジャー。ケアプラン作成の専門職</td>
+            </tr>
+            <tr>
+              <td>ケアプラン</td>
+              <td>居宅サービス計画書（第1〜7表）</td>
+            </tr>
+            <tr>
+              <td>第4表</td>
+              <td>サービス担当者会議の要点</td>
+            </tr>
+            <tr>
+              <td>第5表</td>
+              <td>居宅介護支援経過</td>
+            </tr>
+            <tr>
+              <td>要介護度</td>
+              <td>介護の必要度（要支援1〜2、要介護1〜5）</td>
+            </tr>
+            <tr>
+              <td>LIFE</td>
+              <td>科学的介護情報システム</td>
+            </tr>
+            <tr>
+              <td>国保連</td>
+              <td>国民健康保険団体連合会</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">技術用語</div>
+        <div class="card-body">
+          <table>
+            <tr>
+              <th>用語</th>
+              <th>説明</th>
+            </tr>
+            <tr>
+              <td>SPA</td>
+              <td>Single Page Application</td>
+            </tr>
+            <tr>
+              <td>PWA</td>
+              <td>Progressive Web App</td>
+            </tr>
+            <tr>
+              <td>API</td>
+              <td>Application Programming Interface</td>
+            </tr>
+            <tr>
+              <td>REST</td>
+              <td>HTTPベースのAPI設計スタイル</td>
+            </tr>
+            <tr>
+              <td>JWT</td>
+              <td>JSON Web Token（認証トークン）</td>
+            </tr>
+            <tr>
+              <td>ORM</td>
+              <td>Object-Relational Mapping</td>
+            </tr>
+            <tr>
+              <td>モノレポ</td>
+              <td>複数プロジェクトを単一リポジトリで管理</td>
+            </tr>
+            <tr>
+              <td>マルチテナント</td>
+              <td>複数組織のデータを分離して管理</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== REFERENCES ==================== -->
+  <section id="references" class="section">
+    <div class="section-header">
+      <h2>参考資料</h2>
+      <p>公式ドキュメント・関連リンク</p>
+    </div>
+
+    <div class="card">
+      <div class="card-header">厚生労働省・公式資料</div>
+      <div class="card-body">
+        <ul>
+          <li><a href="https://www.mhlw.go.jp/content/000764680.pdf" target="_blank">居宅サービス計画書標準様式及び記載要領</a></li>
+          <li><a href="https://www.mhlw.go.jp/content/12300000/001316161.pdf" target="_blank">ケアプランデータ連携標準仕様</a></li>
+          <li><a href="https://www.kokuho.or.jp/system/care/careplan/" target="_blank">ケアプランデータ連携システム（国保中央会）</a></li>
+          <li><a href="https://www.mhlw.go.jp/content/12300000/001124428.pdf" target="_blank">介護ソフト選定・導入ポイント集</a></li>
+          <li><a href="https://www.mhlw.go.jp/stf/kaigo-ict.html" target="_blank">介護テクノロジーの利用促進</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">技術ドキュメント</div>
+      <div class="card-body">
+        <ul>
+          <li><a href="https://react.dev/" target="_blank">React公式ドキュメント</a></li>
+          <li><a href="https://www.typescriptlang.org/" target="_blank">TypeScript公式ドキュメント</a></li>
+          <li><a href="https://docs.nestjs.com/" target="_blank">NestJS公式ドキュメント</a></li>
+          <li><a href="https://www.prisma.io/docs" target="_blank">Prisma公式ドキュメント</a></li>
+          <li><a href="https://tanstack.com/query/latest" target="_blank">TanStack Query</a></li>
+          <li><a href="https://zustand-demo.pmnd.rs/" target="_blank">Zustand</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="margin-top: 64px; padding: 32px 0; border-top: 1px solid var(--border); color: var(--text-muted); text-align: center;">
+    <p>KaigoIDE 仕様草案 v0.1.0</p>
+    <p>作成日: 2026年1月29日</p>
+  </footer>
+
+</main>
+
+<script>
+  // Active link highlight
+  const navLinks = document.querySelectorAll('.nav-link');
+  const sections = document.querySelectorAll('.section');
+
+  function updateActiveLink() {
+    let currentSection = '';
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop - 100;
+      if (window.scrollY >= sectionTop) {
+        currentSection = section.getAttribute('id');
+      }
+    });
+
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === '#' + currentSection) {
+        link.classList.add('active');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateActiveLink);
+  updateActiveLink();
+
+  // Smooth scroll
+  navLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href').substring(1);
+      const targetSection = document.getElementById(targetId);
+      if (targetSection) {
+        targetSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
