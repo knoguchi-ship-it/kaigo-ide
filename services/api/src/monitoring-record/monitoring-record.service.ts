@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMonitoringRecordDto } from './dto/create-monitoring-record.dto';
 
@@ -8,6 +8,7 @@ export class MonitoringRecordService {
 
   async findAll(
     clientId: string,
+    tenantId: string,
     options?: { page?: number; limit?: number },
   ) {
     const page = options?.page ?? 1;
@@ -15,7 +16,7 @@ export class MonitoringRecordService {
 
     const [records, total] = await Promise.all([
       this.prisma.monitoringRecord.findMany({
-        where: { clientId },
+        where: { clientId, client: { tenantId } },
         orderBy: { recordDate: 'desc' },
         skip: (page - 1) * limit,
         take: limit,
@@ -25,7 +26,9 @@ export class MonitoringRecordService {
           client: true,
         },
       }),
-      this.prisma.monitoringRecord.count({ where: { clientId } }),
+      this.prisma.monitoringRecord.count({
+        where: { clientId, client: { tenantId } },
+      }),
     ]);
 
     const data = records.map((r) => ({ ...r, recordType: 'MONITORING' as const }));
@@ -36,7 +39,7 @@ export class MonitoringRecordService {
     };
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, tenantId: string) {
     const record = await this.prisma.monitoringRecord.findUnique({
       where: { id },
       include: {
@@ -46,6 +49,7 @@ export class MonitoringRecordService {
       },
     });
     if (!record) throw new NotFoundException('モニタリング記録が見つかりません');
+    if (record.client.tenantId !== tenantId) throw new ForbiddenException();
     return { ...record, recordType: 'MONITORING' as const };
   }
 
@@ -53,7 +57,15 @@ export class MonitoringRecordService {
     clientId: string,
     dto: CreateMonitoringRecordDto,
     createdById: string,
+    tenantId: string,
   ) {
+    // テナント検証: client と carePlan が対象テナントに属することを確認
+    const client = await this.prisma.client.findUnique({ where: { id: clientId } });
+    if (!client || client.tenantId !== tenantId) throw new ForbiddenException();
+
+    const carePlan = await this.prisma.carePlan.findUnique({ where: { id: dto.carePlanId } });
+    if (!carePlan || carePlan.clientId !== clientId) throw new ForbiddenException();
+
     const record = await this.prisma.monitoringRecord.create({
       data: {
         clientId,

@@ -3,9 +3,6 @@ import { Gender, CareLevel } from '@prisma/client';
 
 export class CreateClientDto {
   @IsString()
-  tenantId!: string;
-
-  @IsString()
   familyName!: string;
 
   @IsString()

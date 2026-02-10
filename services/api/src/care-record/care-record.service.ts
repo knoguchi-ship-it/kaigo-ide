@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCareRecordDto } from './dto/create-care-record.dto';
 import { UpdateCareRecordDto } from './dto/update-care-record.dto';
@@ -9,8 +9,12 @@ import type { Prisma } from '@prisma/client';
 export class CareRecordService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(clientId: string, query: CareRecordQueryDto) {
-    const where: Prisma.CareRecordWhereInput = { clientId };
+  async findAll(clientId: string, query: CareRecordQueryDto, tenantId: string) {
+    // テナント分離: clientが対象テナントに属することを検証
+    const where: Prisma.CareRecordWhereInput = {
+      clientId,
+      client: { tenantId },
+    };
 
     if (query.category) {
       where.category = query.category;
@@ -46,16 +50,21 @@ export class CareRecordService {
     };
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, tenantId: string) {
     const record = await this.prisma.careRecord.findUnique({
       where: { id },
       include: { client: true },
     });
     if (!record) throw new NotFoundException('記録が見つかりません');
+    if (record.client.tenantId !== tenantId) throw new ForbiddenException();
     return { ...record, recordType: 'GENERAL' as const };
   }
 
-  async create(clientId: string, dto: CreateCareRecordDto, createdById: string) {
+  async create(clientId: string, dto: CreateCareRecordDto, createdById: string, tenantId: string) {
+    // テナント検証: clientが対象テナントに属することを確認
+    const client = await this.prisma.client.findUnique({ where: { id: clientId } });
+    if (!client || client.tenantId !== tenantId) throw new ForbiddenException();
+
     const record = await this.prisma.careRecord.create({
       data: {
         clientId,
@@ -71,13 +80,13 @@ export class CareRecordService {
     return { ...record, recordType: 'GENERAL' as const };
   }
 
-  async update(id: string, dto: UpdateCareRecordDto) {
-    await this.findOne(id);
+  async update(id: string, dto: UpdateCareRecordDto, tenantId: string) {
+    await this.findOne(id, tenantId);
     return this.prisma.careRecord.update({
       where: { id },
       data: {
-        ...(dto.recordDate && { recordDate: new Date(dto.recordDate) }),
-        ...(dto.category && { category: dto.category }),
+        ...(dto.recordDate !== undefined && { recordDate: new Date(dto.recordDate) }),
+        ...(dto.category !== undefined && { category: dto.category }),
         ...(dto.content !== undefined && { content: dto.content }),
         ...(dto.relatedOrganization !== undefined && {
           relatedOrganization: dto.relatedOrganization,
@@ -92,8 +101,8 @@ export class CareRecordService {
     });
   }
 
-  async remove(id: string) {
-    await this.findOne(id);
+  async remove(id: string, tenantId: string) {
+    await this.findOne(id, tenantId);
     return this.prisma.careRecord.delete({ where: { id } });
   }
 }

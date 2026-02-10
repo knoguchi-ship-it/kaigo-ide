@@ -5,6 +5,7 @@
 // --- 利用者 ---
 export interface Client {
   id: string;
+  tenantId: string;
   familyName: string;
   givenName: string;
   familyNameKana: string;
@@ -197,13 +198,18 @@ export interface AiGenerateResponse {
   model: string;
 }
 
-// --- ユーザー ---
+// --- ユーザー（フロントエンド用 - センシティブ情報を含まない） ---
 export interface User {
   id: string;
   email: string;
   name: string;
   tenantId: string;
   role: 'ADMIN' | 'CARE_MANAGER';
-  googleAccessToken?: string;
-  googleRefreshToken?: string;
+}
+
+// --- 認証レスポンス ---
+export interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: User;
 }
