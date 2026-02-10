@@ -6,6 +6,7 @@ import { MonitoringRecordModule } from './monitoring-record/monitoring-record.mo
 import { ClientModule } from './client/client.module';
 import { CarePlanModule } from './care-plan/care-plan.module';
 import { AuthModule } from './auth/auth.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AuthModule } from './auth/auth.module';
     CarePlanModule,
     CareRecordModule,
     MonitoringRecordModule,
+    AiModule,
   ],
 })
 export class AppModule {}

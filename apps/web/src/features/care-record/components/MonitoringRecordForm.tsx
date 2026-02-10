@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { Save, Sparkles, Star, Loader2 } from 'lucide-react';
@@ -7,6 +7,7 @@ import { useClients } from '../../../hooks/use-clients';
 import { useCarePlans } from '../../../hooks/use-care-plans';
 import { useCreateMonitoringRecord } from '../../../hooks/use-monitoring-records';
 import { toast } from '../../../components/ui/Toast';
+import { AiGenerateDialog } from '../../../components/ui/AiGenerateDialog';
 
 interface MonitoringFormData {
   clientId: string;
@@ -28,6 +29,8 @@ export function MonitoringRecordForm() {
   const navigate = useNavigate();
   const { data: clients, isLoading: clientsLoading } = useClients();
   const createMutation = useCreateMonitoringRecord();
+  const [aiCommentIndex, setAiCommentIndex] = useState<number | null>(null);
+  const [showAiOverall, setShowAiOverall] = useState(false);
 
   const { register, handleSubmit, control, watch, setValue, reset, formState: { errors } } =
     useForm<MonitoringFormData>({
@@ -248,12 +251,29 @@ export function MonitoringRecordForm() {
                         <label className="text-xs text-gray-500">評価コメント</label>
                         <button
                           type="button"
+                          onClick={() => setAiCommentIndex(aiCommentIndex === index ? null : index)}
                           className="flex items-center gap-1 px-2 py-0.5 text-[10px] border border-purple-300 text-purple-700 rounded hover:bg-purple-50 transition-colors"
                         >
                           <Sparkles className="w-3 h-3" />
                           AI生成
                         </button>
                       </div>
+                      {aiCommentIndex === index && (
+                        <AiGenerateDialog
+                          request={{
+                            type: 'monitoring_comment',
+                            context: {
+                              goalText: field.goalText,
+                              rating: Number(currentRating),
+                            },
+                          }}
+                          onAccept={(text) => {
+                            setValue(`evaluations.${index}.comment`, text);
+                            setAiCommentIndex(null);
+                          }}
+                          onClose={() => setAiCommentIndex(null)}
+                        />
+                      )}
                       <textarea
                         {...register(`evaluations.${index}.comment`)}
                         rows={2}
@@ -282,12 +302,32 @@ export function MonitoringRecordForm() {
             <label className="text-sm font-medium text-gray-700">総合所見</label>
             <button
               type="button"
+              onClick={() => setShowAiOverall((v) => !v)}
               className="flex items-center gap-1 px-2 py-1 text-xs border border-purple-300 text-purple-700 rounded-lg hover:bg-purple-50 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               AI生成（全評価から）
             </button>
           </div>
+          {showAiOverall && (
+            <AiGenerateDialog
+              request={{
+                type: 'monitoring_overall',
+                context: {
+                  evaluations: watch('evaluations').map((e) => ({
+                    goalText: e.goalText,
+                    rating: Number(e.rating),
+                    comment: e.comment,
+                  })),
+                },
+              }}
+              onAccept={(text) => {
+                setValue('overallComment', text);
+                setShowAiOverall(false);
+              }}
+              onClose={() => setShowAiOverall(false)}
+            />
+          )}
           <textarea
             {...register('overallComment')}
             rows={4}

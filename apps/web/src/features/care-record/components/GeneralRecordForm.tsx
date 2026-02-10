@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { Save, Sparkles, Mic, Loader2 } from 'lucide-react';
@@ -9,6 +10,7 @@ import {
 import { useClients } from '../../../hooks/use-clients';
 import { useCreateCareRecord, useUpdateCareRecord } from '../../../hooks/use-care-records';
 import { toast } from '../../../components/ui/Toast';
+import { AiGenerateDialog } from '../../../components/ui/AiGenerateDialog';
 
 const CATEGORIES = Object.entries(RECORD_CATEGORY_LABELS) as [
   RecordCategory,
@@ -37,7 +39,10 @@ export function GeneralRecordForm({ editRecord }: GeneralRecordFormProps) {
 
   const isEdit = !!editRecord;
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
+  const [showAiContent, setShowAiContent] = useState(false);
+  const [showAiJudgment, setShowAiJudgment] = useState(false);
+
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormValues>({
     defaultValues: editRecord
       ? {
           clientId: editRecord.clientId,
@@ -181,12 +186,23 @@ export function GeneralRecordForm({ editRecord }: GeneralRecordFormProps) {
             </button>
             <button
               type="button"
+              onClick={() => setShowAiContent((v) => !v)}
               className="flex items-center gap-1 px-3 py-1.5 text-xs border border-purple-300 text-purple-700 rounded-lg hover:bg-purple-50 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               AI生成
             </button>
           </div>
+          {showAiContent && (
+            <AiGenerateDialog
+              request={{ type: 'care_record', context: { category: watch('category') } }}
+              onAccept={(text) => {
+                setValue('content', text, { shouldValidate: true });
+                setShowAiContent(false);
+              }}
+              onClose={() => setShowAiContent(false)}
+            />
+          )}
           <textarea
             {...register('content', {
               required: '内容を入力してください',
@@ -223,12 +239,23 @@ export function GeneralRecordForm({ editRecord }: GeneralRecordFormProps) {
           <div className="flex items-center gap-2 mb-2">
             <button
               type="button"
+              onClick={() => setShowAiJudgment((v) => !v)}
               className="flex items-center gap-1 px-3 py-1.5 text-xs border border-purple-300 text-purple-700 rounded-lg hover:bg-purple-50 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5" />
               AI提案
             </button>
           </div>
+          {showAiJudgment && (
+            <AiGenerateDialog
+              request={{ type: 'judgment' }}
+              onAccept={(text) => {
+                setValue('professionalJudgment', text);
+                setShowAiJudgment(false);
+              }}
+              onClose={() => setShowAiJudgment(false)}
+            />
+          )}
           <textarea
             {...register('professionalJudgment')}
             rows={3}
