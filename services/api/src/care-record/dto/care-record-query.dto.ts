@@ -1,10 +1,11 @@
 import { IsOptional, IsString, IsEnum, IsDateString, IsInt, Min } from 'class-validator';
 import { Type } from 'class-transformer';
+import { CareRecordCategory } from '@prisma/client';
 
 export class CareRecordQueryDto {
   @IsOptional()
-  @IsEnum(['VISIT', 'PHONE', 'FAX', 'MAIL', 'CONFERENCE', 'OTHER'])
-  category?: 'VISIT' | 'PHONE' | 'FAX' | 'MAIL' | 'CONFERENCE' | 'OTHER';
+  @IsEnum(CareRecordCategory)
+  category?: CareRecordCategory;
 
   @IsOptional()
   @IsDateString()

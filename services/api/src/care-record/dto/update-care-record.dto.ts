@@ -1,4 +1,5 @@
 import { IsString, IsEnum, IsDateString, IsOptional, MaxLength } from 'class-validator';
+import { CareRecordCategory } from '@prisma/client';
 
 export class UpdateCareRecordDto {
   @IsOptional()
@@ -6,8 +7,8 @@ export class UpdateCareRecordDto {
   recordDate?: string;
 
   @IsOptional()
-  @IsEnum(['VISIT', 'PHONE', 'FAX', 'MAIL', 'CONFERENCE', 'OTHER'])
-  category?: 'VISIT' | 'PHONE' | 'FAX' | 'MAIL' | 'CONFERENCE' | 'OTHER';
+  @IsEnum(CareRecordCategory)
+  category?: CareRecordCategory;
 
   @IsOptional()
   @IsString()

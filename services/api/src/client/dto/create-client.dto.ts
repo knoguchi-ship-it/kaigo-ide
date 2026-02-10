@@ -1,4 +1,5 @@
 import { IsString, IsEnum, IsDateString, IsOptional } from 'class-validator';
+import { Gender, CareLevel } from '@prisma/client';
 
 export class CreateClientDto {
   @IsString()
@@ -19,22 +20,14 @@ export class CreateClientDto {
   @IsDateString()
   birthDate!: string;
 
-  @IsEnum(['MALE', 'FEMALE'])
-  gender!: 'MALE' | 'FEMALE';
+  @IsEnum(Gender)
+  gender!: Gender;
 
   @IsString()
   insuranceNumber!: string;
 
-  @IsEnum([
-    'SUPPORT_1',
-    'SUPPORT_2',
-    'CARE_1',
-    'CARE_2',
-    'CARE_3',
-    'CARE_4',
-    'CARE_5',
-  ])
-  careLevel!: string;
+  @IsEnum(CareLevel)
+  careLevel!: CareLevel;
 
   @IsDateString()
   certificationDate!: string;

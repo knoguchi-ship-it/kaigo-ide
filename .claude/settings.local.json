@@ -16,7 +16,10 @@
       "Bash(git add:*)",
       "Bash(git commit -m \"$\\(cat <<''EOF''\nInitial project setup: monorepo with React + NestJS\n\n- pnpm workspaces + Turborepo monorepo structure\n- apps/web: React 18 + Vite + Tailwind CSS frontend\n- services/api: NestJS + Prisma backend\n- packages/types: Shared TypeScript type definitions\n- Care record \\(第5表\\) feature scaffolding:\n  - Two record types: General + Monitoring evaluation\n  - Record type selection, forms, timeline list\n  - Prisma schema with all models\n  - REST API endpoints for CRUD operations\n- Care plan simple management with goal list\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(git config:*)",
-      "Bash(git commit -m \"$\\(cat <<''EOF''\nInitial project setup: monorepo with React + NestJS\n\n- pnpm workspaces + Turborepo monorepo structure\n- apps/web: React 18 + Vite + Tailwind CSS frontend\n- services/api: NestJS + Prisma backend\n- packages/types: Shared TypeScript type definitions\n- Care record feature scaffolding with two record types\n- Prisma schema with all models\n- REST API endpoints for CRUD operations\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nInitial project setup: monorepo with React + NestJS\n\n- pnpm workspaces + Turborepo monorepo structure\n- apps/web: React 18 + Vite + Tailwind CSS frontend\n- services/api: NestJS + Prisma backend\n- packages/types: Shared TypeScript type definitions\n- Care record feature scaffolding with two record types\n- Prisma schema with all models\n- REST API endpoints for CRUD operations\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(gh auth status:*)",
+      "Bash(gh repo create:*)",
+      "Bash(DATABASE_URL=\"postgresql://dummy:dummy@localhost:5432/dummy\" npx prisma generate:*)"
     ]
   }
 }

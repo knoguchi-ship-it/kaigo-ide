@@ -27,7 +27,7 @@ export class CareRecordService {
     const page = query.page ?? 1;
     const limit = query.limit ?? 20;
 
-    const [data, total] = await Promise.all([
+    const [records, total] = await Promise.all([
       this.prisma.careRecord.findMany({
         where,
         orderBy: { recordDate: 'desc' },
@@ -37,6 +37,8 @@ export class CareRecordService {
       }),
       this.prisma.careRecord.count({ where }),
     ]);
+
+    const data = records.map((r) => ({ ...r, recordType: 'GENERAL' as const }));
 
     return {
       data,
@@ -50,11 +52,11 @@ export class CareRecordService {
       include: { client: true },
     });
     if (!record) throw new NotFoundException('記録が見つかりません');
-    return record;
+    return { ...record, recordType: 'GENERAL' as const };
   }
 
   async create(clientId: string, dto: CreateCareRecordDto, createdById: string) {
-    return this.prisma.careRecord.create({
+    const record = await this.prisma.careRecord.create({
       data: {
         clientId,
         recordDate: new Date(dto.recordDate),
@@ -66,6 +68,7 @@ export class CareRecordService {
         createdById,
       },
     });
+    return { ...record, recordType: 'GENERAL' as const };
   }
 
   async update(id: string, dto: UpdateCareRecordDto) {

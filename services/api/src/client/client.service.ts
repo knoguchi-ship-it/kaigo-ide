@@ -19,6 +19,12 @@ export class ClientService {
   }
 
   async create(dto: CreateClientDto) {
-    return this.prisma.client.create({ data: dto });
+    return this.prisma.client.create({
+      data: {
+        ...dto,
+        birthDate: new Date(dto.birthDate),
+        certificationDate: new Date(dto.certificationDate),
+      },
+    });
   }
 }

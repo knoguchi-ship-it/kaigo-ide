@@ -13,7 +13,7 @@ export class MonitoringRecordService {
     const page = options?.page ?? 1;
     const limit = options?.limit ?? 20;
 
-    const [data, total] = await Promise.all([
+    const [records, total] = await Promise.all([
       this.prisma.monitoringRecord.findMany({
         where: { clientId },
         orderBy: { recordDate: 'desc' },
@@ -27,6 +27,8 @@ export class MonitoringRecordService {
       }),
       this.prisma.monitoringRecord.count({ where: { clientId } }),
     ]);
+
+    const data = records.map((r) => ({ ...r, recordType: 'MONITORING' as const }));
 
     return {
       data,
@@ -44,7 +46,7 @@ export class MonitoringRecordService {
       },
     });
     if (!record) throw new NotFoundException('モニタリング記録が見つかりません');
-    return record;
+    return { ...record, recordType: 'MONITORING' as const };
   }
 
   async create(
@@ -52,7 +54,7 @@ export class MonitoringRecordService {
     dto: CreateMonitoringRecordDto,
     createdById: string,
   ) {
-    return this.prisma.monitoringRecord.create({
+    const record = await this.prisma.monitoringRecord.create({
       data: {
         clientId,
         carePlanId: dto.carePlanId,
@@ -72,5 +74,6 @@ export class MonitoringRecordService {
       },
       include: { evaluations: true },
     });
+    return { ...record, recordType: 'MONITORING' as const };
   }
 }

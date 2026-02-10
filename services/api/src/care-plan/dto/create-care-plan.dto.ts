@@ -8,10 +8,11 @@ import {
   IsInt,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { GoalType } from '@prisma/client';
 
 class GoalDto {
-  @IsEnum(['SHORT_TERM', 'LONG_TERM'])
-  type!: 'SHORT_TERM' | 'LONG_TERM';
+  @IsEnum(GoalType)
+  type!: GoalType;
 
   @IsString()
   text!: string;

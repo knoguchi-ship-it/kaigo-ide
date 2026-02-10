@@ -1,11 +1,12 @@
 import { IsString, IsEnum, IsDateString, IsOptional, MaxLength } from 'class-validator';
+import { CareRecordCategory } from '@prisma/client';
 
 export class CreateCareRecordDto {
   @IsDateString()
   recordDate!: string;
 
-  @IsEnum(['VISIT', 'PHONE', 'FAX', 'MAIL', 'CONFERENCE', 'OTHER'])
-  category!: 'VISIT' | 'PHONE' | 'FAX' | 'MAIL' | 'CONFERENCE' | 'OTHER';
+  @IsEnum(CareRecordCategory)
+  category!: CareRecordCategory;
 
   @IsString()
   @MaxLength(5000)
