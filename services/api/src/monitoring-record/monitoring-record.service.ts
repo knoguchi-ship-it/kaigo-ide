@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMonitoringRecordDto } from './dto/create-monitoring-record.dto';
 
@@ -11,8 +11,8 @@ export class MonitoringRecordService {
     tenantId: string,
     options?: { page?: number; limit?: number },
   ) {
-    const page = options?.page ?? 1;
-    const limit = options?.limit ?? 20;
+    const page = Math.max(1, options?.page ?? 1);
+    const limit = Math.min(100, Math.max(1, options?.limit ?? 20));
 
     const [records, total] = await Promise.all([
       this.prisma.monitoringRecord.findMany({
@@ -63,8 +63,21 @@ export class MonitoringRecordService {
     const client = await this.prisma.client.findUnique({ where: { id: clientId } });
     if (!client || client.tenantId !== tenantId) throw new ForbiddenException();
 
-    const carePlan = await this.prisma.carePlan.findUnique({ where: { id: dto.carePlanId } });
+    const carePlan = await this.prisma.carePlan.findUnique({
+      where: { id: dto.carePlanId },
+      include: { goals: true },
+    });
     if (!carePlan || carePlan.clientId !== clientId) throw new ForbiddenException();
+
+    // goalIdがこのケアプランの目標に属するか検証
+    const validGoalIds = new Set(carePlan.goals.map((g) => g.id));
+    for (const evaluation of dto.evaluations) {
+      if (!validGoalIds.has(evaluation.goalId)) {
+        throw new BadRequestException(
+          `目標ID "${evaluation.goalId}" はこのケアプランに存在しません`,
+        );
+      }
+    }
 
     const record = await this.prisma.monitoringRecord.create({
       data: {

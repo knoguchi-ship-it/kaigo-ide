@@ -1,14 +1,12 @@
+import { useEffect, useRef } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { Save, Sparkles, Star } from 'lucide-react';
-import { RATING_LABELS } from '@kaigo-ide/types';
-
-// TODO: Load from API (ケアプラン簡易管理の目標リスト)
-const MOCK_GOALS = [
-  { id: 'goal_1', type: 'LONG_TERM' as const, text: '自宅での生活を安全に継続する' },
-  { id: 'goal_2', type: 'SHORT_TERM' as const, text: '週3回デイサービスに参加する' },
-  { id: 'goal_3', type: 'SHORT_TERM' as const, text: '自力で入浴できる状態を維持する' },
-  { id: 'goal_4', type: 'LONG_TERM' as const, text: '地域活動に月1回参加する' },
-];
+import { useNavigate } from 'react-router-dom';
+import { Save, Sparkles, Star, Loader2 } from 'lucide-react';
+import { RATING_LABELS, GOAL_TYPE_LABELS, type GoalType } from '@kaigo-ide/types';
+import { useClients } from '../../../hooks/use-clients';
+import { useCarePlans } from '../../../hooks/use-care-plans';
+import { useCreateMonitoringRecord } from '../../../hooks/use-monitoring-records';
+import { toast } from '../../../components/ui/Toast';
 
 interface MonitoringFormData {
   clientId: string;
@@ -17,6 +15,7 @@ interface MonitoringFormData {
   evaluations: {
     goalId: string;
     goalText: string;
+    goalType: GoalType;
     rating: number;
     comment: string;
   }[];
@@ -26,27 +25,84 @@ interface MonitoringFormData {
 }
 
 export function MonitoringRecordForm() {
-  const { register, handleSubmit, control, watch, formState: { errors } } =
+  const navigate = useNavigate();
+  const { data: clients, isLoading: clientsLoading } = useClients();
+  const createMutation = useCreateMonitoringRecord();
+
+  const { register, handleSubmit, control, watch, setValue, reset, formState: { errors } } =
     useForm<MonitoringFormData>({
       defaultValues: {
+        clientId: '',
+        carePlanId: '',
         recordDate: new Date().toISOString().slice(0, 16),
-        evaluations: MOCK_GOALS.map((g) => ({
-          goalId: g.id,
-          goalText: g.text,
-          rating: 3,
-          comment: '',
-        })),
+        evaluations: [],
         overallComment: '',
         professionalJudgment: '',
         nextAction: '',
       },
     });
 
-  const { fields } = useFieldArray({ control, name: 'evaluations' });
+  const { fields, replace } = useFieldArray({ control, name: 'evaluations' });
+  const selectedClientId = watch('clientId');
+  const selectedCarePlanId = watch('carePlanId');
 
-  const onSubmit = (data: MonitoringFormData) => {
-    // TODO: API call
-    console.log('Submit monitoring record:', data);
+  const { data: carePlans, isLoading: plansLoading } = useCarePlans(
+    selectedClientId || undefined,
+  );
+
+  // 利用者またはケアプラン変更時に目標リストを同期
+  // 単一effectで競合を回避
+  const prevClientRef = useRef('');
+  useEffect(() => {
+    // 利用者が変更された場合はケアプランをリセット
+    if (selectedClientId !== prevClientRef.current) {
+      prevClientRef.current = selectedClientId;
+      setValue('carePlanId', '');
+      replace([]);
+      return;
+    }
+
+    // ケアプランが選択されていれば目標を設定
+    if (selectedCarePlanId && carePlans) {
+      const plan = carePlans.find((p) => p.id === selectedCarePlanId);
+      if (plan) {
+        replace(
+          plan.goals.map((g) => ({
+            goalId: g.id,
+            goalText: g.text,
+            goalType: g.type,
+            rating: 3,
+            comment: '',
+          })),
+        );
+      } else {
+        replace([]);
+      }
+    }
+  }, [selectedClientId, selectedCarePlanId, carePlans, setValue, replace]);
+
+  const onSubmit = async (data: MonitoringFormData) => {
+    const recordDateISO = new Date(data.recordDate).toISOString();
+    try {
+      await createMutation.mutateAsync({
+        clientId: data.clientId,
+        carePlanId: data.carePlanId,
+        recordDate: recordDateISO,
+        evaluations: data.evaluations.map((e) => ({
+          goalId: e.goalId,
+          goalText: e.goalText,
+          rating: Number(e.rating),
+          comment: e.comment,
+        })),
+        overallComment: data.overallComment,
+        professionalJudgment: data.professionalJudgment,
+        nextAction: data.nextAction,
+      });
+      toast('success', 'モニタリング評価を保存しました');
+      navigate('/care-records');
+    } catch {
+      toast('error', '保存に失敗しました');
+    }
   };
 
   return (
@@ -57,7 +113,7 @@ export function MonitoringRecordForm() {
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl space-y-6">
-        {/* 利用者 */}
+        {/* 利用者・ケアプラン */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -68,9 +124,16 @@ export function MonitoringRecordForm() {
               className="w-full border border-gray-300 rounded-lg px-3 py-2.5"
             >
               <option value="">選択してください</option>
-              <option value="client_1">山田 太郎 様</option>
-              <option value="client_2">鈴木 花子 様</option>
+              {clientsLoading && <option disabled>読み込み中...</option>}
+              {clients?.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.familyName} {c.givenName} 様
+                </option>
+              ))}
             </select>
+            {errors.clientId && (
+              <p className="text-red-500 text-xs mt-1">{errors.clientId.message}</p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -79,10 +142,25 @@ export function MonitoringRecordForm() {
             <select
               {...register('carePlanId', { required: 'ケアプランを選択してください' })}
               className="w-full border border-gray-300 rounded-lg px-3 py-2.5"
+              disabled={!selectedClientId}
             >
-              <option value="">選択してください</option>
-              <option value="plan_1">第1版 (2026-01-15作成)</option>
+              <option value="">
+                {!selectedClientId
+                  ? '先に利用者を選択'
+                  : plansLoading
+                    ? '読み込み中...'
+                    : '選択してください'}
+              </option>
+              {carePlans?.map((p) => (
+                <option key={p.id} value={p.id}>
+                  第{p.version}版 ({new Date(p.createdDate).toLocaleDateString('ja-JP')}作成)
+                  {p.goals.length > 0 && ` - 目標${p.goals.length}件`}
+                </option>
+              ))}
             </select>
+            {errors.carePlanId && (
+              <p className="text-red-500 text-xs mt-1">{errors.carePlanId.message}</p>
+            )}
           </div>
         </div>
 
@@ -93,98 +171,110 @@ export function MonitoringRecordForm() {
           </label>
           <input
             type="datetime-local"
-            {...register('recordDate', { required: true })}
+            {...register('recordDate', { required: '実施日を入力してください' })}
             className="w-full max-w-xs border border-gray-300 rounded-lg px-3 py-2.5"
           />
+          {errors.recordDate && (
+            <p className="text-red-500 text-xs mt-1">{errors.recordDate.message}</p>
+          )}
         </div>
 
         {/* 目標別評価 */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-semibold text-gray-900">目標別評価</h3>
-            <div className="text-xs text-gray-400">
-              1=未達成 / 3=概ね達成 / 5=大幅に達成
+        {fields.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-semibold text-gray-900">目標別評価</h3>
+              <div className="text-xs text-gray-400">
+                1=未達成 / 3=概ね達成 / 5=大幅に達成
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {fields.map((field, index) => {
+                const currentRating = watch(`evaluations.${index}.rating`);
+
+                return (
+                  <div
+                    key={field.id}
+                    className="bg-white border border-gray-200 rounded-xl p-5"
+                  >
+                    <div className="flex items-start gap-3 mb-3">
+                      <span
+                        className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                          field.goalType === 'LONG_TERM'
+                            ? 'bg-amber-100 text-amber-700'
+                            : 'bg-green-100 text-green-700'
+                        }`}
+                      >
+                        {GOAL_TYPE_LABELS[field.goalType]}
+                      </span>
+                      <p className="text-sm font-medium text-gray-800">
+                        {field.goalText}
+                      </p>
+                    </div>
+
+                    {/* 5段階評価 */}
+                    <div className="flex items-center gap-1 mb-3">
+                      {[1, 2, 3, 4, 5].map((rating) => (
+                        <label
+                          key={rating}
+                          className="flex flex-col items-center cursor-pointer group"
+                        >
+                          <input
+                            type="radio"
+                            value={rating}
+                            {...register(`evaluations.${index}.rating`, {
+                              valueAsNumber: true,
+                            })}
+                            className="sr-only"
+                          />
+                          <Star
+                            className={`w-8 h-8 transition-colors ${
+                              rating <= Number(currentRating)
+                                ? 'fill-yellow-400 text-yellow-400'
+                                : 'text-gray-300 group-hover:text-yellow-200'
+                            }`}
+                          />
+                          <span className="text-[10px] text-gray-400 mt-0.5">
+                            {RATING_LABELS[rating]}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+
+                    {/* 評価コメント */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <label className="text-xs text-gray-500">評価コメント</label>
+                        <button
+                          type="button"
+                          className="flex items-center gap-1 px-2 py-0.5 text-[10px] border border-purple-300 text-purple-700 rounded hover:bg-purple-50 transition-colors"
+                        >
+                          <Sparkles className="w-3 h-3" />
+                          AI生成
+                        </button>
+                      </div>
+                      <textarea
+                        {...register(`evaluations.${index}.comment`)}
+                        rows={2}
+                        placeholder="この目標に対する評価コメント..."
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm resize-y"
+                      />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
+        )}
 
-          <div className="space-y-4">
-            {fields.map((field, index) => {
-              const goal = MOCK_GOALS.find((g) => g.id === field.goalId);
-              const currentRating = watch(`evaluations.${index}.rating`);
-
-              return (
-                <div
-                  key={field.id}
-                  className="bg-white border border-gray-200 rounded-xl p-5"
-                >
-                  <div className="flex items-start gap-3 mb-3">
-                    <span
-                      className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                        goal?.type === 'LONG_TERM'
-                          ? 'bg-amber-100 text-amber-700'
-                          : 'bg-green-100 text-green-700'
-                      }`}
-                    >
-                      {goal?.type === 'LONG_TERM' ? '長期' : '短期'}
-                    </span>
-                    <p className="text-sm font-medium text-gray-800">
-                      {field.goalText}
-                    </p>
-                  </div>
-
-                  {/* 5段階評価 */}
-                  <div className="flex items-center gap-1 mb-3">
-                    {[1, 2, 3, 4, 5].map((rating) => (
-                      <label
-                        key={rating}
-                        className="flex flex-col items-center cursor-pointer group"
-                      >
-                        <input
-                          type="radio"
-                          value={rating}
-                          {...register(`evaluations.${index}.rating`, {
-                            valueAsNumber: true,
-                          })}
-                          className="sr-only"
-                        />
-                        <Star
-                          className={`w-8 h-8 transition-colors ${
-                            rating <= Number(currentRating)
-                              ? 'fill-yellow-400 text-yellow-400'
-                              : 'text-gray-300 group-hover:text-yellow-200'
-                          }`}
-                        />
-                        <span className="text-[10px] text-gray-400 mt-0.5">
-                          {RATING_LABELS[rating]}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-
-                  {/* 評価コメント */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <label className="text-xs text-gray-500">評価コメント</label>
-                      <button
-                        type="button"
-                        className="flex items-center gap-1 px-2 py-0.5 text-[10px] border border-purple-300 text-purple-700 rounded hover:bg-purple-50 transition-colors"
-                      >
-                        <Sparkles className="w-3 h-3" />
-                        AI生成
-                      </button>
-                    </div>
-                    <textarea
-                      {...register(`evaluations.${index}.comment`)}
-                      rows={2}
-                      placeholder="この目標に対する評価コメント..."
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm resize-y"
-                    />
-                  </div>
-                </div>
-              );
-            })}
+        {selectedCarePlanId && fields.length === 0 && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
+            <p className="text-amber-700 text-sm">
+              このケアプランには目標が登録されていません。ケアプランに目標を追加してください。
+            </p>
           </div>
-        </div>
+        )}
 
         {/* 総合所見 */}
         <div>
@@ -236,9 +326,14 @@ export function MonitoringRecordForm() {
         <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
           <button
             type="submit"
-            className="flex items-center gap-2 px-6 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+            disabled={createMutation.isPending || fields.length === 0}
+            className="flex items-center gap-2 px-6 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
           >
-            <Save className="w-4 h-4" />
+            {createMutation.isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4" />
+            )}
             保存（Googleカレンダーに同期）
           </button>
         </div>

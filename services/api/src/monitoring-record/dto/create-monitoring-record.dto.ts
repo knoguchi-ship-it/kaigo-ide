@@ -2,6 +2,7 @@ import {
   IsString,
   IsDateString,
   IsArray,
+  ArrayMinSize,
   ValidateNested,
   IsInt,
   Min,
@@ -16,6 +17,7 @@ class EvaluationDto {
   @IsString()
   goalText!: string;
 
+  @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(5)
@@ -33,6 +35,7 @@ export class CreateMonitoringRecordDto {
   recordDate!: string;
 
   @IsArray()
+  @ArrayMinSize(1, { message: '少なくとも1つの目標評価が必要です' })
   @ValidateNested({ each: true })
   @Type(() => EvaluationDto)
   evaluations!: EvaluationDto[];

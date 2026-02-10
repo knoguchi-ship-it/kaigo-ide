@@ -28,8 +28,8 @@ export class CareRecordService {
       where.content = { contains: query.keyword, mode: 'insensitive' };
     }
 
-    const page = query.page ?? 1;
-    const limit = query.limit ?? 20;
+    const page = Math.max(1, query.page ?? 1);
+    const limit = Math.min(100, Math.max(1, query.limit ?? 20));
 
     const [records, total] = await Promise.all([
       this.prisma.careRecord.findMany({
