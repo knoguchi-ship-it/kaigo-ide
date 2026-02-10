@@ -4,9 +4,11 @@ import { AppLayout } from './components/layout/AppLayout';
 import { DashboardPage } from './pages/DashboardPage';
 import { CareRecordListPage } from './pages/care-record/CareRecordListPage';
 import { CareRecordNewPage } from './pages/care-record/CareRecordNewPage';
+import { CareRecordEditPage } from './pages/care-record/CareRecordEditPage';
 import { LoginPage } from './pages/LoginPage';
 import { AuthCallbackPage } from './pages/AuthCallbackPage';
 import { useAuthStore } from './stores/auth-store';
+import { ToastContainer } from './components/ui/Toast';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -22,21 +24,25 @@ export function App() {
   }, [loadFromStorage]);
 
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/auth/callback" element={<AuthCallbackPage />} />
-      <Route
-        element={
-          <ProtectedRoute>
-            <AppLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="/care-records" element={<CareRecordListPage />} />
-        <Route path="/care-records/new" element={<CareRecordNewPage />} />
-      </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <ToastContainer />
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/auth/callback" element={<AuthCallbackPage />} />
+        <Route
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/care-records" element={<CareRecordListPage />} />
+          <Route path="/care-records/new" element={<CareRecordNewPage />} />
+          <Route path="/clients/:clientId/care-records/:id/edit" element={<CareRecordEditPage />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   );
 }

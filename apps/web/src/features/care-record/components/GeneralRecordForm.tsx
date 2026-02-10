@@ -1,33 +1,105 @@
 import { useForm } from 'react-hook-form';
-import { Save, Sparkles, Mic } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Save, Sparkles, Mic, Loader2 } from 'lucide-react';
 import {
   RECORD_CATEGORY_LABELS,
   type RecordCategory,
-  type CreateCareRecordInput,
+  type CareRecord,
 } from '@kaigo-ide/types';
+import { useClients } from '../../../hooks/use-clients';
+import { useCreateCareRecord, useUpdateCareRecord } from '../../../hooks/use-care-records';
+import { toast } from '../../../components/ui/Toast';
 
 const CATEGORIES = Object.entries(RECORD_CATEGORY_LABELS) as [
   RecordCategory,
   string,
 ][];
 
-export function GeneralRecordForm() {
-  const { register, handleSubmit, formState: { errors } } = useForm<CreateCareRecordInput>({
-    defaultValues: {
-      recordDate: new Date().toISOString().slice(0, 16),
-      category: 'VISIT',
-      content: '',
-    },
+interface FormValues {
+  clientId: string;
+  recordDate: string;
+  category: RecordCategory;
+  content: string;
+  relatedOrganization?: string;
+  professionalJudgment?: string;
+  clientFamilyOpinion?: string;
+}
+
+interface GeneralRecordFormProps {
+  editRecord?: CareRecord;
+}
+
+export function GeneralRecordForm({ editRecord }: GeneralRecordFormProps) {
+  const navigate = useNavigate();
+  const { data: clients, isLoading: clientsLoading } = useClients();
+  const createMutation = useCreateCareRecord();
+  const updateMutation = useUpdateCareRecord();
+
+  const isEdit = !!editRecord;
+
+  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
+    defaultValues: editRecord
+      ? {
+          clientId: editRecord.clientId,
+          recordDate: editRecord.recordDate.slice(0, 16),
+          category: editRecord.category,
+          content: editRecord.content,
+          relatedOrganization: editRecord.relatedOrganization ?? '',
+          professionalJudgment: editRecord.professionalJudgment ?? '',
+          clientFamilyOpinion: editRecord.clientFamilyOpinion ?? '',
+        }
+      : {
+          clientId: '',
+          recordDate: new Date().toISOString().slice(0, 16),
+          category: 'VISIT',
+          content: '',
+        },
   });
 
-  const onSubmit = (data: CreateCareRecordInput) => {
-    // TODO: API call
-    console.log('Submit general record:', data);
+  const isPending = createMutation.isPending || updateMutation.isPending;
+
+  const onSubmit = async (data: FormValues) => {
+    // datetime-localの値にタイムゾーンを付与してISO 8601に変換
+    const recordDateISO = new Date(data.recordDate).toISOString();
+
+    try {
+      if (isEdit && editRecord) {
+        await updateMutation.mutateAsync({
+          clientId: editRecord.clientId,
+          id: editRecord.id,
+          data: {
+            recordDate: recordDateISO,
+            category: data.category,
+            content: data.content,
+            relatedOrganization: data.relatedOrganization || undefined,
+            professionalJudgment: data.professionalJudgment || undefined,
+            clientFamilyOpinion: data.clientFamilyOpinion || undefined,
+          },
+        });
+        toast('success', '記録を更新しました');
+      } else {
+        await createMutation.mutateAsync({
+          clientId: data.clientId,
+          recordDate: recordDateISO,
+          category: data.category,
+          content: data.content,
+          relatedOrganization: data.relatedOrganization || undefined,
+          professionalJudgment: data.professionalJudgment || undefined,
+          clientFamilyOpinion: data.clientFamilyOpinion || undefined,
+        });
+        toast('success', '記録を保存しました');
+      }
+      navigate('/care-records');
+    } catch {
+      toast('error', '保存に失敗しました');
+    }
   };
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-1">一般記録</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-1">
+        {isEdit ? '一般記録を編集' : '一般記録'}
+      </h2>
       <p className="text-sm text-gray-500 mb-6">
         Googleカレンダー「KaigoIDE_支援経過記録」に保存されます
       </p>
@@ -41,11 +113,15 @@ export function GeneralRecordForm() {
           <select
             {...register('clientId', { required: '利用者を選択してください' })}
             className="w-full border border-gray-300 rounded-lg px-3 py-2.5"
+            disabled={isEdit}
           >
             <option value="">選択してください</option>
-            {/* TODO: Load from API */}
-            <option value="client_1">山田 太郎 様</option>
-            <option value="client_2">鈴木 花子 様</option>
+            {clientsLoading && <option disabled>読み込み中...</option>}
+            {clients?.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.familyName} {c.givenName} 様
+              </option>
+            ))}
           </select>
           {errors.clientId && (
             <p className="text-red-500 text-xs mt-1">{errors.clientId.message}</p>
@@ -62,6 +138,9 @@ export function GeneralRecordForm() {
             {...register('recordDate', { required: '日時を入力してください' })}
             className="w-full border border-gray-300 rounded-lg px-3 py-2.5"
           />
+          {errors.recordDate && (
+            <p className="text-red-500 text-xs mt-1">{errors.recordDate.message}</p>
+          )}
         </div>
 
         {/* 区分 */}
@@ -175,10 +254,15 @@ export function GeneralRecordForm() {
         <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
           <button
             type="submit"
-            className="flex items-center gap-2 px-6 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+            disabled={isPending}
+            className="flex items-center gap-2 px-6 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
           >
-            <Save className="w-4 h-4" />
-            保存（Googleカレンダーに同期）
+            {isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4" />
+            )}
+            {isEdit ? '更新' : '保存（Googleカレンダーに同期）'}
           </button>
         </div>
       </form>

@@ -207,6 +207,17 @@ export interface User {
   role: 'ADMIN' | 'CARE_MANAGER';
 }
 
+// --- ページネーション ---
+export interface PaginatedResponse<T> {
+  data: T[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 // --- 認証レスポンス ---
 export interface AuthResponse {
   accessToken: string;

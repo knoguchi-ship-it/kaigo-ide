@@ -1,43 +1,62 @@
-import { Link } from 'react-router-dom';
-import { Plus, FileDown, Calendar } from 'lucide-react';
+import { useState, useMemo, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Plus, FileDown, Calendar, Pencil, Trash2, Loader2, AlertCircle } from 'lucide-react';
 import {
   RECORD_CATEGORY_LABELS,
   type RecordCategory,
+  type Client,
 } from '@kaigo-ide/types';
-
-// TODO: Replace with real data from API
-const MOCK_RECORDS = [
-  {
-    id: '1',
-    recordType: 'GENERAL' as const,
-    clientName: '山田 太郎',
-    recordDate: '2026-02-04T14:30:00',
-    category: 'VISIT' as RecordCategory,
-    content:
-      '自宅訪問。体調良好。血圧128/82。食事量も安定しており、デイサービスの利用も継続的に行えている。',
-    judgment: 'サービス継続で問題なし。次回モニタリング時に歩行状態を再確認。',
-  },
-  {
-    id: '2',
-    recordType: 'MONITORING' as const,
-    clientName: '山田 太郎',
-    recordDate: '2026-02-01T10:00:00',
-    overallComment:
-      '全体的に目標はおおむね達成できている。デイサービスの参加は安定。歩行能力の維持が今後の課題。',
-  },
-  {
-    id: '3',
-    recordType: 'GENERAL' as const,
-    clientName: '鈴木 花子',
-    recordDate: '2026-02-03T10:15:00',
-    category: 'PHONE' as RecordCategory,
-    content:
-      'デイサービスより連絡。先週の利用状況について報告あり。食事量がやや減少傾向。',
-    relatedOrg: 'ABCデイサービス',
-  },
-];
+import { useClients } from '../../hooks/use-clients';
+import { useCareRecords, useDeleteCareRecord } from '../../hooks/use-care-records';
+import { toast } from '../../components/ui/Toast';
+import { useDebounce } from '../../hooks/use-debounce';
 
 export function CareRecordListPage() {
+  const navigate = useNavigate();
+  const { data: clients } = useClients();
+
+  const [selectedClientId, setSelectedClientId] = useState('');
+  const [category, setCategory] = useState<RecordCategory | ''>('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [keyword, setKeyword] = useState('');
+  const debouncedKeyword = useDebounce(keyword, 300);
+  const [page, setPage] = useState(1);
+
+  const { data: recordsData, isLoading, isError } = useCareRecords(
+    selectedClientId || undefined,
+    {
+      category: category || undefined,
+      from: dateFrom || undefined,
+      to: dateTo || undefined,
+      keyword: debouncedKeyword || undefined,
+      page,
+      limit: 20,
+    },
+  );
+
+  const deleteMutation = useDeleteCareRecord();
+
+  const handleDelete = useCallback(async (clientId: string, recordId: string) => {
+    if (!window.confirm('この記録を削除しますか？')) return;
+    try {
+      await deleteMutation.mutateAsync({ clientId, id: recordId });
+      toast('success', '記録を削除しました');
+    } catch {
+      toast('error', '削除に失敗しました');
+    }
+  }, [deleteMutation]);
+
+  const records = recordsData?.data ?? [];
+  const meta = recordsData?.meta;
+
+  // O(1) client lookup
+  const clientMap = useMemo(() => {
+    const map = new Map<string, Client>();
+    clients?.forEach((c) => map.set(c.id, c));
+    return map;
+  }, [clients]);
+
   return (
     <div>
       {/* Header */}
@@ -58,11 +77,19 @@ export function CareRecordListPage() {
             <Plus className="w-4 h-4" />
             新規記録
           </Link>
-          <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+          <button
+            disabled
+            title="今後実装予定"
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+          >
             <FileDown className="w-4 h-4" />
             PDF出力
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+          <button
+            disabled
+            title="今後実装予定"
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+          >
             <Calendar className="w-4 h-4" />
             カレンダー表示
           </button>
@@ -71,21 +98,35 @@ export function CareRecordListPage() {
 
       {/* Filters */}
       <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap items-end gap-4">
           <div>
             <label className="block text-xs text-gray-500 mb-1">利用者</label>
-            <select className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
-              <option value="">全員</option>
-              <option>山田 太郎</option>
-              <option>鈴木 花子</option>
+            <select
+              value={selectedClientId}
+              onChange={(e) => { setSelectedClientId(e.target.value); setPage(1); }}
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            >
+              <option value="">選択してください</option>
+              {clients?.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.familyName} {c.givenName}
+                </option>
+              ))}
             </select>
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">記録タイプ</label>
-            <select className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+            <label className="block text-xs text-gray-500 mb-1">区分</label>
+            <select
+              value={category}
+              onChange={(e) => { setCategory(e.target.value as RecordCategory | ''); setPage(1); }}
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            >
               <option value="">すべて</option>
-              <option value="GENERAL">一般記録</option>
-              <option value="MONITORING">モニタリング評価</option>
+              {Object.entries(RECORD_CATEGORY_LABELS).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
             </select>
           </div>
           <div>
@@ -93,11 +134,15 @@ export function CareRecordListPage() {
             <div className="flex items-center gap-2">
               <input
                 type="date"
+                value={dateFrom}
+                onChange={(e) => { setDateFrom(e.target.value); setPage(1); }}
                 className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
               />
-              <span className="text-gray-400">〜</span>
+              <span className="text-gray-400">~</span>
               <input
                 type="date"
+                value={dateTo}
+                onChange={(e) => { setDateTo(e.target.value); setPage(1); }}
                 className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
               />
             </div>
@@ -106,6 +151,8 @@ export function CareRecordListPage() {
             <label className="block text-xs text-gray-500 mb-1">キーワード</label>
             <input
               type="text"
+              value={keyword}
+              onChange={(e) => { setKeyword(e.target.value); setPage(1); }}
               placeholder="検索..."
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
             />
@@ -113,62 +160,126 @@ export function CareRecordListPage() {
         </div>
       </div>
 
-      {/* Timeline */}
-      <div className="space-y-3">
-        {MOCK_RECORDS.map((record) => (
-          <div
-            key={record.id}
-            className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-sm transition-shadow"
+      {/* Content */}
+      {!selectedClientId ? (
+        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+          <p className="text-gray-500">利用者を選択すると記録が表示されます</p>
+        </div>
+      ) : isLoading ? (
+        <div className="flex justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+        </div>
+      ) : isError ? (
+        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+          <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
+          <p className="text-red-600">記録の読み込みに失敗しました</p>
+          <p className="text-sm text-gray-400 mt-1">ネットワークを確認してください</p>
+        </div>
+      ) : records.length === 0 ? (
+        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+          <p className="text-gray-500">記録がありません</p>
+          <Link
+            to="/care-records/new"
+            className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
           >
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <time className="text-sm font-medium text-gray-700">
-                    {new Date(record.recordDate).toLocaleDateString('ja-JP', {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </time>
-                  {record.recordType === 'GENERAL' && record.category && (
-                    <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
-                      {RECORD_CATEGORY_LABELS[record.category]}
-                    </span>
-                  )}
-                  {record.recordType === 'MONITORING' && (
-                    <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
-                      モニタリング評価
-                    </span>
-                  )}
-                  <span className="text-sm text-gray-500">
-                    {record.clientName}様
-                  </span>
+            <Plus className="w-4 h-4" />
+            新規記録を作成
+          </Link>
+        </div>
+      ) : (
+        <>
+          {/* Timeline */}
+          <div className="space-y-3">
+            {records.map((record) => {
+              const client = clientMap.get(record.clientId);
+              return (
+                <div
+                  key={record.id}
+                  className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-sm transition-shadow"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <time className="text-sm font-medium text-gray-700">
+                          {new Date(record.recordDate).toLocaleDateString('ja-JP', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </time>
+                        <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                          {RECORD_CATEGORY_LABELS[record.category]}
+                        </span>
+                        {client && (
+                          <span className="text-sm text-gray-500">
+                            {client.familyName} {client.givenName}様
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-800 leading-relaxed">
+                        {record.content}
+                      </p>
+                      {record.professionalJudgment && (
+                        <p className="mt-2 text-sm text-gray-600 border-l-2 border-primary-300 pl-3">
+                          <span className="font-medium">判断:</span>{' '}
+                          {record.professionalJudgment}
+                        </p>
+                      )}
+                      {record.relatedOrganization && (
+                        <p className="mt-1 text-xs text-gray-400">
+                          関係機関: {record.relatedOrganization}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 ml-4">
+                      <button
+                        onClick={() => navigate(`/clients/${record.clientId}/care-records/${record.id}/edit`)}
+                        className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                        aria-label="編集"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(record.clientId, record.id)}
+                        disabled={deleteMutation.isPending}
+                        className="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 disabled:opacity-50"
+                        aria-label="削除"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-800 leading-relaxed">
-                  {record.recordType === 'GENERAL'
-                    ? record.content
-                    : record.overallComment}
-                </p>
-                {record.recordType === 'GENERAL' && record.judgment && (
-                  <p className="mt-2 text-sm text-gray-600 border-l-2 border-primary-300 pl-3">
-                    <span className="font-medium">判断:</span>{' '}
-                    {record.judgment}
-                  </p>
-                )}
-                {record.recordType === 'GENERAL' &&
-                  'relatedOrg' in record &&
-                  record.relatedOrg && (
-                    <p className="mt-1 text-xs text-gray-400">
-                      関係機関: {record.relatedOrg}
-                    </p>
-                  )}
-              </div>
-            </div>
+              );
+            })}
           </div>
-        ))}
-      </div>
+
+          {/* Pagination */}
+          {meta && meta.totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-6">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1}
+                className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+              >
+                前へ
+              </button>
+              <span className="text-sm text-gray-600">
+                {page} / {meta.totalPages} ページ（全{meta.total}件）
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
+                disabled={page >= meta.totalPages}
+                className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+              >
+                次へ
+              </button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
