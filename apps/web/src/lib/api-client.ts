@@ -92,6 +92,48 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json();
 }
 
+async function requestBlob(path: string): Promise<Blob> {
+  const token = localStorage.getItem('access_token');
+
+  const res = await fetch(`${API_BASE}${path}`, {
+    headers: {
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+
+  if (res.status === 401) {
+    if (!isRefreshing) {
+      isRefreshing = true;
+      refreshPromise = tryRefreshToken().finally(() => {
+        isRefreshing = false;
+        refreshPromise = null;
+      });
+    }
+
+    const refreshed = await (refreshPromise ?? Promise.resolve(false));
+    if (refreshed) {
+      const newToken = localStorage.getItem('access_token');
+      const retryRes = await fetch(`${API_BASE}${path}`, {
+        headers: {
+          ...(newToken && { Authorization: `Bearer ${newToken}` }),
+        },
+      });
+      if (retryRes.ok) return retryRes.blob();
+    }
+
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    window.location.href = '/login';
+    throw new ApiError(401, '認証が必要です');
+  }
+
+  if (!res.ok) {
+    throw new ApiError(res.status, 'ファイルのダウンロードに失敗しました');
+  }
+
+  return res.blob();
+}
+
 export const api = {
   get: <T>(path: string) => request<T>(path),
 
@@ -103,4 +145,6 @@ export const api = {
 
   delete: <T>(path: string) =>
     request<T>(path, { method: 'DELETE' }),
+
+  getBlob: (path: string) => requestBlob(path),
 };

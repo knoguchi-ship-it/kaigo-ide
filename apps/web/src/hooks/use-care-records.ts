@@ -105,3 +105,33 @@ export function useDeleteCareRecord() {
     },
   });
 }
+
+export function useExportPdf() {
+  return useMutation({
+    mutationFn: async ({
+      clientId,
+      from,
+      to,
+    }: {
+      clientId: string;
+      from?: string;
+      to?: string;
+    }) => {
+      const qs = new URLSearchParams();
+      if (from) qs.set('from', from);
+      if (to) qs.set('to', to);
+      const query = qs.toString();
+      const path = `/clients/${clientId}/care-records/export/pdf${query ? `?${query}` : ''}`;
+      const blob = await api.getBlob(path);
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `care-record-${new Date().toISOString().slice(0, 10)}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    },
+  });
+}

@@ -111,10 +111,11 @@ export class AuthService {
     return this.generateTokens(user);
   }
 
-  private generateTokens(user: { id: string; email: string; tenantId: string; role: string }) {
+  private generateTokens(user: { id: string; email: string; name: string; tenantId: string; role: string }) {
     const basePayload = {
       sub: user.id,
       email: user.email,
+      name: user.name,
       tenantId: user.tenantId,
       role: user.role,
     };
@@ -131,6 +132,7 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
+        name: user.name,
         tenantId: user.tenantId,
         role: user.role,
       },

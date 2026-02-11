@@ -7,7 +7,7 @@ import {
   type Client,
 } from '@kaigo-ide/types';
 import { useClients } from '../../hooks/use-clients';
-import { useCareRecords, useDeleteCareRecord } from '../../hooks/use-care-records';
+import { useCareRecords, useDeleteCareRecord, useExportPdf } from '../../hooks/use-care-records';
 import { toast } from '../../components/ui/Toast';
 import { useDebounce } from '../../hooks/use-debounce';
 
@@ -36,6 +36,7 @@ export function CareRecordListPage() {
   );
 
   const deleteMutation = useDeleteCareRecord();
+  const exportPdfMutation = useExportPdf();
 
   const handleDelete = useCallback(async (clientId: string, recordId: string) => {
     if (!window.confirm('この記録を削除しますか？')) return;
@@ -46,6 +47,20 @@ export function CareRecordListPage() {
       toast('error', '削除に失敗しました');
     }
   }, [deleteMutation]);
+
+  const handleExportPdf = useCallback(async () => {
+    if (!selectedClientId) return;
+    try {
+      await exportPdfMutation.mutateAsync({
+        clientId: selectedClientId,
+        from: dateFrom || undefined,
+        to: dateTo || undefined,
+      });
+      toast('success', 'PDFをダウンロードしました');
+    } catch {
+      toast('error', 'PDF出力に失敗しました');
+    }
+  }, [selectedClientId, dateFrom, dateTo, exportPdfMutation]);
 
   const records = recordsData?.data ?? [];
   const meta = recordsData?.meta;
@@ -78,11 +93,15 @@ export function CareRecordListPage() {
             新規記録
           </Link>
           <button
-            disabled
-            title="今後実装予定"
+            onClick={handleExportPdf}
+            disabled={!selectedClientId || exportPdfMutation.isPending}
             className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
           >
-            <FileDown className="w-4 h-4" />
+            {exportPdfMutation.isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <FileDown className="w-4 h-4" />
+            )}
             PDF出力
           </button>
           <button

@@ -1,7 +1,8 @@
 # KaigoIDE プロジェクト引継ぎ書
 
 **作成日**: 2026-01-29
-**バージョン**: 0.1.0
+**最終更新日**: 2026-02-11
+**バージョン**: 0.2.0
 
 ---
 
@@ -22,42 +23,64 @@
 
 ## 2. 現在のフェーズ
 
-**草案作成・ブラッシュアップ中**
+**Phase 1 (MVP) 開発中 - 主要機能実装完了**
 
-- 開発は未着手（指示があるまで開始しない）
-- ドキュメント体系を整備中
-- HTMLで可視化した草案をベースにブラッシュアップ中
+- Monorepo 環境構築済み（pnpm workspaces + Turborepo）
+- 認証（JWT + Google OAuth）実装済み
+- 支援経過記録（第5表）CRUD + PDF出力 実装済み
+- モニタリング評価記録 実装済み
+- AI文章生成 実装済み
+- Googleカレンダー連携（Calendar API 呼び出し）は未実装
 
 ---
 
-## 3. 作成済みファイル一覧
+## 3. 実装済み機能一覧
+
+### Phase 1 進捗
+
+| 機能 | 状態 | 備考 |
+|------|------|------|
+| 環境構築（Monorepo + DB） | **完了** | pnpm + Turborepo + Prisma |
+| 認証（JWT + Google OAuth） | **完了** | アクセス/リフレッシュトークン |
+| 利用者管理（CRUD） | **完了** | テナント分離済み |
+| ケアプラン簡易管理 | **完了** | 作成日・版数・目標 |
+| 第5表 一般記録 CRUD | **完了** | 6区分 + 検索・フィルタ |
+| 第5表 モニタリング評価 | **完了** | 目標別5段階評価 |
+| 第5表 AI文章生成 | **完了** | 記録・評価・判断文の生成 |
+| 第5表 PDF出力 | **完了** | 厚労省様式・和暦・pdfmake |
+| Googleカレンダー連携 | **未実装** | DB保存のみ、Calendar API 未呼び出し |
+| 第4表 担当者会議 | **未実装** | Phase 1 スコープだが未着手 |
+
+### ソースコード構成
 
 ```
-C:\VSCode\CloudePL\kaigoIDE\docs\
-├── index.html                    ★ 草案全体をHTML化（ブラウザで閲覧用）
-├── HANDOVER.md                   ★ この引継ぎ書
-├── DOCUMENTATION_STRUCTURE.md    ドキュメント体系の説明
-├── SPECIFICATION_DRAFT.md        最初の仕様草案
-├── GLOSSARY.md                   用語集
+C:\VSCode\CloudePL\kaigoIDE\
+├── apps/web/                     # React 18 + Vite フロントエンド
+│   └── src/
+│       ├── pages/                # ページコンポーネント
+│       ├── hooks/                # カスタムフック (TanStack Query)
+│       ├── lib/                  # API クライアント
+│       ├── features/             # 機能別コンポーネント
+│       ├── components/           # 共通UIコンポーネント
+│       └── stores/               # Zustand ストア
 │
-├── 00_PROJECT/
-│   └── SOW.md                    作業範囲記述書
+├── services/api/                 # NestJS バックエンド
+│   ├── src/
+│   │   ├── auth/                 # 認証 (JWT + Google OAuth)
+│   │   ├── client/               # 利用者管理
+│   │   ├── care-plan/            # ケアプラン簡易管理
+│   │   ├── care-record/          # 支援経過記録（第5表）+ PDF出力
+│   │   ├── monitoring-record/    # モニタリング評価
+│   │   ├── ai/                   # AI文章生成
+│   │   ├── pdf/                  # PDF生成共通 (pdfmake + Noto Sans JP)
+│   │   └── prisma/               # Prisma ORM
+│   ├── prisma/schema.prisma      # DBスキーマ
+│   └── assets/fonts/             # 日本語フォント (Noto Sans JP)
 │
-├── 01_REQUIREMENTS/
-│   └── PRD.md                    プロダクト要件定義書
-│
-├── 02_DESIGN/
-│   └── SDD.md                    ソフトウェア設計書
-│
-└── 03_ADR/
-    ├── README.md                 ADR一覧・テンプレート
-    ├── 0001-use-react-typescript.md
-    ├── 0002-monorepo-structure.md
-    ├── 0003-state-management.md
-    ├── 0004-backend-framework.md
-    ├── 0005-database-selection.md
-    ├── 0006-authentication-strategy.md
-    └── 0007-google-calendar-integration.md  ★ 重要
+├── packages/types/               # 共有型定義
+├── docs/                         # ドキュメント
+├── pnpm-workspace.yaml
+└── turbo.json
 ```
 
 ---
@@ -68,15 +91,19 @@ C:\VSCode\CloudePL\kaigoIDE\docs\
 
 | レイヤー | 技術 |
 |---------|------|
-| フロントエンド | React 18 + TypeScript + Vite + Tailwind CSS |
-| 状態管理 | TanStack Query + Zustand |
-| バックエンド | NestJS + Prisma |
-| データベース | PostgreSQL（マスタ・設定のみ）|
+| フロントエンド | React 18 + TypeScript 5 + Vite + Tailwind CSS + shadcn/ui |
+| 状態管理 | TanStack Query (server) + Zustand (UI) + React Hook Form |
+| バックエンド | NestJS 10 + Prisma ORM |
+| データベース | PostgreSQL 16（マスタ・設定のみ）|
 | 認証 | JWT + Google OAuth 2.0 |
+| PDF生成 | pdfmake + Noto Sans JP |
+| Monorepo | pnpm workspaces + Turborepo |
 
-### 4.2 ★ Googleカレンダー連携（最重要設計）
+### 4.2 Googleカレンダー連携（最重要設計・ADR-0007）
 
 **第5表（支援経過記録）・第4表（担当者会議）はGoogleカレンダーがプライマリデータストア**
+
+> **現状**: 実装では PostgreSQL にデータ保存中。CareRecord に `googleCalendarEventId` カラムは存在するが、Calendar API 呼び出しは未実装。今後の実装で Calendar API と同期する予定。
 
 ```
 ユーザーのGoogleアカウント
@@ -84,52 +111,23 @@ C:\VSCode\CloudePL\kaigoIDE\docs\
 │   └── イベント: 記録日時で配置
 │
 └── KaigoIDE_担当者会議 （カレンダー）
-    └── イベント: ケアプラン作成日で配置 ★
+    └── イベント: ケアプラン作成日で配置
 ```
 
-#### 第5表（支援経過記録）
-- イベント日付: **記録日時**（実際の日時）
-- タイトル: `[区分] 利用者名様`
-- Extended Properties: 利用者ID、区分、判断など
+### 4.3 アーキテクチャ方針
 
-#### 第4表（担当者会議）
-- イベント日付: **ケアプラン（第1表・第2表）の作成日**
-- タイトル: `[目的] 利用者名様 担当者会議`
-- 本文: 結論 + JSON（出席者・議題）
-- **厚労省様式でPDF出力可能**
+- **テナント分離**: 全データアクセスに `tenantId` チェック
+- **レイヤー構成**: Controller → Service → Prisma（Repository レイヤーは省略）
+- **型共有**: `packages/types` で Frontend/Backend 共通型定義
 
 ---
 
-## 5. Phase 1（MVP）スコープ
-
-### 最優先機能
-| 機能 | 概要 | Googleカレンダー |
-|------|------|-----------------|
-| 第5表（支援経過記録） | 日々の記録 | ✅ 連携 |
-| 第4表（担当者会議） | 会議記録・PDF出力 | ✅ 連携 |
-| ★ケアプラン簡易管理 | 作成日・版数のみ（第4表紐づけ用） | - |
-| 利用者管理 | 基本情報管理 | - |
-| 認証 | ログイン + Google OAuth | - |
-
-### ケアプラン簡易管理について（決定済み）
-- **Phase 1では第1表・第2表の内容（利用者意向、援助方針、目標等）は含まない**
-- 担当者会議の紐づけに必要な「作成日・版数・目的」のみを管理
-- Phase 2でフル機能のケアプラン管理に拡張
-
-### Phase 2以降
-- ケアプラン（第1〜3表）フル機能
-- サービス利用票（第6〜7表）
-- アセスメント、モニタリング
-- LIFE連携、請求管理
-
----
-
-## 6. 未解決の課題・検討事項
+## 5. 未解決の課題・検討事項
 
 ### 要検討
 | # | 課題 | 状況 |
 |---|------|------|
-| 1 | ~~ケアプラン（第1表・第2表）の簡易管理をPhase 1に含めるか~~ | ✅ **決定済み（含める）** |
+| 1 | Googleカレンダー連携の実装タイミング | PostgreSQL中心で先行開発中 |
 | 2 | オフライン時の一時保存方法 | 未検討 |
 | 3 | 音声入力APIの選定（Google/Azure/AWS） | 未決定 |
 | 4 | 料金体系（月額/従量） | 未決定 |
@@ -143,43 +141,51 @@ C:\VSCode\CloudePL\kaigoIDE\docs\
 
 ---
 
-## 7. 次のステップ（推奨）
+## 6. 次のステップ（推奨）
 
-### 草案ブラッシュアップ継続
-1. ケアプラン（第1表・第2表）のPhase 1スコープ決定
-2. 画面遷移・ワイヤーフレームの詳細化
-3. PDF出力のレイアウト詳細
+### 残りの Phase 1 実装
+1. Googleカレンダー連携（第5表の記録同期）
+2. 第4表（担当者会議）CRUD + PDF出力
+3. テンプレート機能（F5-006）
 
-### 開発準備（開発指示後）
-1. プロジェクト環境セットアップ
-2. Google Cloud Console設定（OAuth、Calendar API）
-3. 基本UIコンポーネント作成
+### 品質向上
+1. ユニットテスト追加
+2. E2Eテスト（Playwright）
+3. エラーハンドリングの統一
 
 ---
 
-## 8. 草案確認方法
+## 7. 重要なポイント（引継ぎ者向け）
 
-ブラウザで以下を開く：
+1. **Phase 1 主要機能は実装済み** - 第5表CRUD + PDF出力 + モニタリング + AI生成
+2. **Googleカレンダー連携は未実装** - ADR-0007の設計方針は維持、段階的に実装予定
+3. **担当者会議の日付** - 会議開催日ではなく「ケアプラン作成日」に配置（ADR-0007）
+4. **SDD は v0.2.0 に更新済み** - 実装と同期済み
+5. **テナント分離** - 全エンドポイントで `tenantId` による分離を確認すること
+
+---
+
+## 8. ドキュメント一覧
 
 ```
-C:\VSCode\CloudePL\kaigoIDE\docs\index.html
+docs/
+├── HANDOVER.md                   ★ この引継ぎ書 (v0.2.0)
+├── 00_PROJECT/SOW.md             作業範囲記述書
+├── 01_REQUIREMENTS/PRD.md        プロダクト要件定義書
+├── 02_DESIGN/SDD.md              ソフトウェア設計書 (v0.2.0 実装同期済み)
+├── 03_ADR/
+│   ├── 0001〜0006                技術選定ADR
+│   └── 0007-google-calendar-integration.md  ★ 最重要
+├── GLOSSARY.md                   用語集
+├── DOCUMENTATION_STRUCTURE.md    ドキュメント体系
+├── SPECIFICATION_DRAFT.md        初期仕様草案
+├── index.html                    草案HTML可視化
+└── mockup.html                   モックアップ
 ```
 
-左サイドバーから各セクションにジャンプ可能。
-
 ---
 
-## 9. 重要なポイント（引継ぎ者向け）
-
-1. **開発は未着手** - ユーザーの指示があるまで開始しない
-2. **Googleカレンダーがプライマリ** - 第5表・第4表のデータはGoogleカレンダーに保存
-3. **担当者会議の日付** - 会議開催日ではなく「ケアプラン作成日」に配置
-4. **PDF出力** - 第4表は厚労省様式でダウンロード可能にする
-5. **草案はHTMLで可視化** - `index.html`を見ながらブラッシュアップ
-
----
-
-## 10. 参考リンク
+## 9. 参考リンク
 
 ### 公式資料
 - [厚労省 居宅サービス計画書標準様式](https://www.mhlw.go.jp/content/000764680.pdf)

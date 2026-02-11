@@ -2,9 +2,9 @@
 # ソフトウェア設計書
 
 **プロダクト名**: KaigoIDE
-**文書バージョン**: 0.1.0
+**文書バージョン**: 0.2.0
 **作成日**: 2026年1月29日
-**最終更新日**: 2026年1月29日
+**最終更新日**: 2026年2月11日
 
 ---
 
@@ -332,56 +332,65 @@ export const routes = [
 
 ### 4.1 ディレクトリ構造
 
+> **注**: 初版では `modules/` ディレクトリ下に Repository レイヤーを含む設計としていたが、
+> 実装では Prisma ORM を Service から直接呼び出す簡潔な構造を採用した。
+> Repository レイヤーはクエリが複雑化した段階で導入を検討する。
+
 ```
 services/api/src/
 ├── main.ts                       # エントリーポイント
 ├── app.module.ts                 # ルートモジュール
 │
-├── modules/                      # 機能モジュール
-│   ├── auth/                     # 認証
-│   │   ├── auth.module.ts
-│   │   ├── auth.controller.ts
-│   │   ├── auth.service.ts
-│   │   ├── strategies/           # Passport戦略
-│   │   ├── guards/               # 認証ガード
-│   │   └── dto/                  # データ転送オブジェクト
-│   │
-│   ├── client/                   # 利用者管理
-│   │   ├── client.module.ts
-│   │   ├── client.controller.ts
-│   │   ├── client.service.ts
-│   │   ├── client.repository.ts
-│   │   └── dto/
-│   │
-│   ├── care-record/              # 支援経過記録
-│   │   ├── care-record.module.ts
-│   │   ├── care-record.controller.ts
-│   │   ├── care-record.service.ts
-│   │   ├── care-record.repository.ts
-│   │   └── dto/
-│   │
-│   └── conference/               # 担当者会議
-│       ├── conference.module.ts
-│       ├── conference.controller.ts
-│       ├── conference.service.ts
-│       ├── conference.repository.ts
-│       └── dto/
+├── auth/                         # 認証
+│   ├── auth.module.ts
+│   ├── auth.controller.ts
+│   ├── auth.service.ts
+│   ├── strategies/               # Passport戦略 (JWT, Google OAuth)
+│   │   ├── jwt.strategy.ts
+│   │   ├── jwt-payload.interface.ts
+│   │   └── google.strategy.ts
+│   ├── guards/                   # 認証ガード
+│   │   └── jwt-auth.guard.ts
+│   └── decorators/               # カスタムデコレータ
+│       └── current-user.decorator.ts
 │
-├── common/                       # 共通機能
-│   ├── decorators/               # カスタムデコレータ
-│   ├── filters/                  # 例外フィルター
-│   ├── guards/                   # 共通ガード
-│   ├── interceptors/             # インターセプター
-│   ├── pipes/                    # パイプ
-│   └── middleware/               # ミドルウェア
+├── client/                       # 利用者管理
+│   ├── client.module.ts
+│   ├── client.controller.ts
+│   ├── client.service.ts
+│   └── dto/
 │
-├── config/                       # 設定
-│   ├── configuration.ts
-│   └── validation.ts
+├── care-plan/                    # ケアプラン簡易管理
+│   ├── care-plan.module.ts
+│   ├── care-plan.controller.ts
+│   ├── care-plan.service.ts
+│   └── dto/
+│
+├── care-record/                  # 支援経過記録（第5表）
+│   ├── care-record.module.ts
+│   ├── care-record.controller.ts
+│   ├── care-record.service.ts
+│   ├── care-record-pdf.service.ts  # 第5表PDF生成
+│   └── dto/
+│
+├── monitoring-record/            # モニタリング評価記録
+│   ├── monitoring-record.module.ts
+│   ├── monitoring-record.controller.ts
+│   ├── monitoring-record.service.ts
+│   └── dto/
+│
+├── ai/                           # AI文章生成
+│   ├── ai.module.ts
+│   ├── ai.controller.ts
+│   └── ai.service.ts
+│
+├── pdf/                          # PDF生成共通
+│   ├── pdf.module.ts
+│   └── pdf.service.ts            # pdfmake ラッパー + 日本語フォント
 │
 └── prisma/                       # Prisma
-    ├── schema.prisma
-    └── migrations/
+    ├── prisma.module.ts
+    └── prisma.service.ts
 ```
 
 ### 4.2 モジュール設計
@@ -392,22 +401,23 @@ services/api/src/
 ┌─────────────────────────────────────────┐
 │           Controller Layer              │  ← HTTPリクエスト/レスポンス
 ├─────────────────────────────────────────┤
-│            Service Layer                │  ← ビジネスロジック
+│            Service Layer                │  ← ビジネスロジック + データアクセス
 ├─────────────────────────────────────────┤
-│          Repository Layer               │  ← データアクセス
-├─────────────────────────────────────────┤
-│              Prisma ORM                 │  ← DB操作
+│           Prisma ORM (直接)             │  ← DB操作
 └─────────────────────────────────────────┘
 ```
+
+> **注**: Repository レイヤーは省略し、Service から Prisma を直接呼び出す構成を採用。
+> クエリが複雑化した段階で Repository の導入を検討する。
 
 #### 4.2.2 モジュール実装例
 
 ```typescript
 // care-record/care-record.module.ts
 @Module({
-  imports: [PrismaModule],
+  imports: [PdfModule],
   controllers: [CareRecordController],
-  providers: [CareRecordService, CareRecordRepository],
+  providers: [CareRecordService, CareRecordPdfService],
   exports: [CareRecordService],
 })
 export class CareRecordModule {}
@@ -416,50 +426,64 @@ export class CareRecordModule {}
 @Controller('clients/:clientId/care-records')
 @UseGuards(JwtAuthGuard)
 export class CareRecordController {
-  constructor(private readonly careRecordService: CareRecordService) {}
+  constructor(
+    private readonly careRecordService: CareRecordService,
+    private readonly careRecordPdfService: CareRecordPdfService,
+  ) {}
 
   @Get()
-  async findAll(
+  findAll(
     @Param('clientId') clientId: string,
     @Query() query: CareRecordQueryDto,
-    @CurrentUser() user: User,
+    @CurrentUser() user: AuthUser,
   ) {
     return this.careRecordService.findAll(clientId, query, user.tenantId);
   }
 
+  @Get('export/pdf')
+  async exportPdf(
+    @Param('clientId') clientId: string,
+    @Query() query: ExportPdfQueryDto,
+    @CurrentUser() user: AuthUser,
+    @Res() res: Response,
+  ) {
+    const { client, records } = await this.careRecordService.findForExport(
+      clientId, { from: query.from, to: query.to }, user.tenantId,
+    );
+    const pdfBuffer = await this.careRecordPdfService.generateTable5Pdf(
+      client, records, user.name, { from: query.from, to: query.to },
+    );
+    res.set({ 'Content-Type': 'application/pdf' });
+    res.end(pdfBuffer);
+  }
+
   @Post()
-  async create(
+  create(
     @Param('clientId') clientId: string,
     @Body() dto: CreateCareRecordDto,
-    @CurrentUser() user: User,
+    @CurrentUser() user: AuthUser,
   ) {
-    return this.careRecordService.create(clientId, dto, user);
+    return this.careRecordService.create(clientId, dto, user.id, user.tenantId);
   }
 }
 
 // care-record/care-record.service.ts
 @Injectable()
 export class CareRecordService {
-  constructor(private readonly repository: CareRecordRepository) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async findAll(clientId: string, query: CareRecordQueryDto, tenantId: string) {
-    // テナント権限チェック
-    await this.verifyClientAccess(clientId, tenantId);
-
-    return this.repository.findMany({
+    const where: Prisma.CareRecordWhereInput = {
       clientId,
-      ...query,
-    });
+      client: { tenantId },  // テナント分離
+    };
+    // ... フィルタ条件構築 + ページネーション
   }
 
-  async create(clientId: string, dto: CreateCareRecordDto, user: User) {
-    await this.verifyClientAccess(clientId, user.tenantId);
-
-    return this.repository.create({
-      ...dto,
-      clientId,
-      createdById: user.id,
-    });
+  async create(clientId: string, dto: CreateCareRecordDto, createdById: string, tenantId: string) {
+    const client = await this.prisma.client.findUnique({ where: { id: clientId } });
+    if (!client || client.tenantId !== tenantId) throw new ForbiddenException();
+    return this.prisma.careRecord.create({ data: { clientId, ...dto, createdById } });
   }
 }
 ```
@@ -489,20 +513,17 @@ export class CareRecordService {
 #### 4.3.2 マルチテナント
 
 ```typescript
-// 全てのデータアクセスにtenantIdを付与
-@Injectable()
-export class CareRecordRepository {
-  async findMany(params: FindManyParams & { tenantId: string }) {
-    return this.prisma.careRecord.findMany({
-      where: {
-        client: {
-          tenantId: params.tenantId,  // テナント分離
-        },
-        ...params.where,
-      },
-    });
-  }
-}
+// 全てのデータアクセスにtenantIdを付与（Service内で直接Prisma呼び出し）
+const where: Prisma.CareRecordWhereInput = {
+  clientId,
+  client: { tenantId },  // テナント分離: clientのtenantIdで検証
+};
+
+const records = await this.prisma.careRecord.findMany({
+  where,
+  orderBy: { recordDate: 'desc' },
+  include: { client: true },
+});
 ```
 
 ---
@@ -591,6 +612,14 @@ export class CareRecordRepository {
 
 ### 5.2 Prismaスキーマ
 
+> **注**: 以下は実装中の `services/api/prisma/schema.prisma` を反映した最新版。
+> 初版 (v0.1.0) からの主な変更点:
+> - Client: 姓名を分割（`familyName` / `givenName`）
+> - CareRecord: カラム名を明確化（`relatedOrganization`, `professionalJudgment`, `clientFamilyOpinion`）
+> - UserRole: `USER` → `CARE_MANAGER`
+> - CarePlan / MonitoringRecord を追加
+> - Conference / Attendee / AgendaItem は将来実装（Phase 1ではGoogleカレンダー連携予定）
+
 ```prisma
 // prisma/schema.prisma
 
@@ -605,11 +634,10 @@ datasource db {
 
 // テナント（事業所）
 model Tenant {
-  id             String   @id @default(cuid())
-  name           String
-  providerNumber String   @map("provider_number")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   users   User[]
   clients Client[]
@@ -619,50 +647,54 @@ model Tenant {
 
 // ユーザー
 model User {
-  id           String   @id @default(cuid())
-  tenantId     String   @map("tenant_id")
-  email        String   @unique
-  passwordHash String   @map("password_hash")
-  name         String
-  role         UserRole @default(USER)
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id                 String   @id @default(cuid())
+  email              String   @unique
+  name               String
+  role               UserRole @default(CARE_MANAGER)
+  tenantId           String   @map("tenant_id")
+  googleAccessToken  String?  @map("google_access_token")
+  googleRefreshToken String?  @map("google_refresh_token")
+  hashedPassword     String?  @map("hashed_password")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
 
-  tenant      Tenant       @relation(fields: [tenantId], references: [id])
-  careRecords CareRecord[]
-  conferences Conference[]
+  tenant            Tenant             @relation(fields: [tenantId], references: [id])
+  careRecords       CareRecord[]
+  monitoringRecords MonitoringRecord[]
 
+  @@index([tenantId])
   @@map("users")
 }
 
 enum UserRole {
   ADMIN
-  USER
+  CARE_MANAGER
 }
 
 // 利用者
 model Client {
-  id                 String    @id @default(cuid())
-  tenantId           String    @map("tenant_id")
-  insurerNumber      String    @map("insurer_number")
-  insuredNumber      String    @map("insured_number")
-  name               String
-  nameKana           String    @map("name_kana")
-  birthDate          DateTime  @map("birth_date")
-  gender             Gender
-  postalCode         String?   @map("postal_code")
-  address            String?
-  phone              String?
-  careLevel          CareLevel @map("care_level")
-  certificationStart DateTime  @map("certification_start")
-  certificationEnd   DateTime  @map("certification_end")
-  createdAt          DateTime  @default(now()) @map("created_at")
-  updatedAt          DateTime  @updatedAt @map("updated_at")
+  id                String    @id @default(cuid())
+  tenantId          String    @map("tenant_id")
+  familyName        String    @map("family_name")
+  givenName         String    @map("given_name")
+  familyNameKana    String    @map("family_name_kana")
+  givenNameKana     String    @map("given_name_kana")
+  birthDate         DateTime  @map("birth_date")
+  gender            Gender
+  insuranceNumber   String    @map("insurance_number")
+  careLevel         CareLevel @map("care_level")
+  certificationDate DateTime  @map("certification_date")
+  address           String?
+  phone             String?
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
 
-  tenant      Tenant       @relation(fields: [tenantId], references: [id])
-  careRecords CareRecord[]
-  conferences Conference[]
+  tenant            Tenant             @relation(fields: [tenantId], references: [id])
+  carePlans         CarePlan[]
+  careRecords       CareRecord[]
+  monitoringRecords MonitoringRecord[]
 
+  @@index([tenantId])
   @@map("clients")
 }
 
@@ -681,24 +713,66 @@ enum CareLevel {
   CARE_5
 }
 
-// 支援経過記録（第5表）
+// ケアプラン簡易管理
+model CarePlan {
+  id          String   @id @default(cuid())
+  clientId    String   @map("client_id")
+  version     Int
+  createdDate DateTime @map("created_date")
+  purpose     String   @default("")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  client            Client             @relation(fields: [clientId], references: [id])
+  goals             CarePlanGoal[]
+  monitoringRecords MonitoringRecord[]
+
+  @@unique([clientId, version])
+  @@index([clientId])
+  @@map("care_plans")
+}
+
+// ケアプラン目標
+model CarePlanGoal {
+  id         String   @id @default(cuid())
+  carePlanId String   @map("care_plan_id")
+  type       GoalType
+  text       String
+  sortOrder  Int      @default(0) @map("sort_order")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  carePlan              CarePlan               @relation(fields: [carePlanId], references: [id], onDelete: Cascade)
+  monitoringEvaluations MonitoringEvaluation[]
+
+  @@index([carePlanId])
+  @@map("care_plan_goals")
+}
+
+enum GoalType {
+  SHORT_TERM
+  LONG_TERM
+}
+
+// 支援経過記録（一般記録・第5表）
 model CareRecord {
-  id            String             @id @default(cuid())
-  clientId      String             @map("client_id")
-  recordDate    DateTime           @map("record_date")
-  category      CareRecordCategory
-  content       String
-  relatedOrg    String?            @map("related_org")
-  judgment      String?
-  familyOpinion String?            @map("family_opinion")
-  createdById   String             @map("created_by_id")
-  createdAt     DateTime           @default(now()) @map("created_at")
-  updatedAt     DateTime           @updatedAt @map("updated_at")
+  id                    String             @id @default(cuid())
+  clientId              String             @map("client_id")
+  recordDate            DateTime           @map("record_date")
+  category              CareRecordCategory
+  content               String
+  relatedOrganization   String?            @map("related_organization")
+  professionalJudgment  String?            @map("professional_judgment")
+  clientFamilyOpinion   String?            @map("client_family_opinion")
+  googleCalendarEventId String?            @map("google_calendar_event_id")
+  createdById           String             @map("created_by_id")
+  createdAt             DateTime           @default(now()) @map("created_at")
+  updatedAt             DateTime           @updatedAt @map("updated_at")
 
   client    Client @relation(fields: [clientId], references: [id])
   createdBy User   @relation(fields: [createdById], references: [id])
 
-  @@index([clientId, recordDate])
+  @@index([clientId, recordDate(sort: Desc)])
   @@map("care_records")
 }
 
@@ -711,72 +785,43 @@ enum CareRecordCategory {
   OTHER
 }
 
-// 担当者会議（第4表）
-model Conference {
-  id             String            @id @default(cuid())
-  clientId       String            @map("client_id")
-  conferenceDate DateTime          @map("conference_date")
-  venue          String
-  purpose        ConferencePurpose
-  conclusion     String?
-  nextActions    String?           @map("next_actions")
-  createdById    String            @map("created_by_id")
-  createdAt      DateTime          @default(now()) @map("created_at")
-  updatedAt      DateTime          @updatedAt @map("updated_at")
+// モニタリング評価記録
+model MonitoringRecord {
+  id                    String   @id @default(cuid())
+  clientId              String   @map("client_id")
+  carePlanId            String   @map("care_plan_id")
+  recordDate            DateTime @map("record_date")
+  overallComment        String   @map("overall_comment")
+  professionalJudgment  String   @map("professional_judgment")
+  nextAction            String   @map("next_action")
+  googleCalendarEventId String?  @map("google_calendar_event_id")
+  createdById           String   @map("created_by_id")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
 
-  client      Client       @relation(fields: [clientId], references: [id])
-  createdBy   User         @relation(fields: [createdById], references: [id])
-  attendees   Attendee[]
-  agendaItems AgendaItem[]
+  client      Client                 @relation(fields: [clientId], references: [id])
+  carePlan    CarePlan               @relation(fields: [carePlanId], references: [id])
+  createdBy   User                   @relation(fields: [createdById], references: [id])
+  evaluations MonitoringEvaluation[]
 
-  @@index([clientId, conferenceDate])
-  @@map("conferences")
+  @@index([clientId, recordDate(sort: Desc)])
+  @@map("monitoring_records")
 }
 
-enum ConferencePurpose {
-  NEW_PLAN
-  PLAN_CHANGE
-  RENEWAL
-  CATEGORY_CHANGE
-  URGENT
-  OTHER
-}
+// モニタリング評価（目標別）
+model MonitoringEvaluation {
+  id                 String @id @default(cuid())
+  monitoringRecordId String @map("monitoring_record_id")
+  goalId             String @map("goal_id")
+  goalText           String @map("goal_text")
+  rating             Int
+  comment            String @default("")
 
-// 出席者
-model Attendee {
-  id              String   @id @default(cuid())
-  conferenceId    String   @map("conference_id")
-  name            String
-  organization    String
-  role            String?
-  isAbsent        Boolean  @default(false) @map("is_absent")
-  inquiryDate     DateTime? @map("inquiry_date")
-  inquiryMethod   String?  @map("inquiry_method")
-  inquiryContent  String?  @map("inquiry_content")
-  inquiryResponse String?  @map("inquiry_response")
-  opinion         String?
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  monitoringRecord MonitoringRecord @relation(fields: [monitoringRecordId], references: [id], onDelete: Cascade)
+  goal             CarePlanGoal     @relation(fields: [goalId], references: [id])
 
-  conference Conference @relation(fields: [conferenceId], references: [id], onDelete: Cascade)
-
-  @@map("attendees")
-}
-
-// 議題
-model AgendaItem {
-  id           String   @id @default(cuid())
-  conferenceId String   @map("conference_id")
-  sortOrder    Int      @map("sort_order")
-  topic        String
-  discussion   String?
-  decision     String?
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-
-  conference Conference @relation(fields: [conferenceId], references: [id], onDelete: Cascade)
-
-  @@map("agenda_items")
+  @@index([monitoringRecordId])
+  @@map("monitoring_evaluations")
 }
 ```
 
@@ -838,12 +883,14 @@ model AgendaItem {
 ### 6.3 レスポンス形式
 
 ```typescript
-// 成功レスポンス
+// 単一リソースレスポンス（直接返却）
 {
-  "data": { ... },
-  "meta": {
-    "timestamp": "2026-01-29T10:00:00.000Z"
-  }
+  "id": "clx...",
+  "clientId": "clx...",
+  "recordDate": "2026-01-15T10:30:00.000Z",
+  "category": "VISIT",
+  "content": "...",
+  ...
 }
 
 // 一覧レスポンス（ページネーション）
@@ -853,23 +900,15 @@ model AgendaItem {
     "total": 100,
     "page": 1,
     "limit": 20,
-    "totalPages": 5,
-    "timestamp": "2026-01-29T10:00:00.000Z"
+    "totalPages": 5
   }
 }
 
-// エラーレスポンス
+// エラーレスポンス（NestJS標準）
 {
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "入力内容に誤りがあります",
-    "details": [
-      { "field": "content", "message": "内容は必須です" }
-    ]
-  },
-  "meta": {
-    "timestamp": "2026-01-29T10:00:00.000Z"
-  }
+  "statusCode": 400,
+  "message": ["content must be a string"],
+  "error": "Bad Request"
 }
 ```
 
@@ -966,3 +1005,4 @@ CREATE INDEX idx_clients_tenant ON clients(tenant_id);
 | バージョン | 日付 | 変更内容 | 作成者 |
 |-----------|------|----------|--------|
 | 0.1.0 | 2026-01-29 | 初版作成 | |
+| 0.2.0 | 2026-02-11 | 実装に合わせて同期: ディレクトリ構造、Prismaスキーマ、レスポンス形式、モジュール実装例を更新 | Claude Code |

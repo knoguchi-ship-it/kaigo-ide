@@ -105,4 +105,40 @@ export class CareRecordService {
     await this.findOne(id, tenantId);
     return this.prisma.careRecord.delete({ where: { id } });
   }
+
+  /**
+   * PDF出力用: ページネーションなし、上限1000件で全件取得
+   */
+  async findForExport(
+    clientId: string,
+    dateRange: { from?: string; to?: string },
+    tenantId: string,
+  ) {
+    const client = await this.prisma.client.findUnique({
+      where: { id: clientId },
+    });
+    if (!client || client.tenantId !== tenantId) {
+      throw new ForbiddenException();
+    }
+
+    const where: Prisma.CareRecordWhereInput = {
+      clientId,
+      client: { tenantId },
+    };
+
+    if (dateRange.from || dateRange.to) {
+      where.recordDate = {};
+      if (dateRange.from) where.recordDate.gte = new Date(dateRange.from);
+      if (dateRange.to) where.recordDate.lte = new Date(dateRange.to);
+    }
+
+    const records = await this.prisma.careRecord.findMany({
+      where,
+      orderBy: { recordDate: 'desc' },
+      take: 1000,
+      include: { client: true },
+    });
+
+    return { client, records };
+  }
 }
