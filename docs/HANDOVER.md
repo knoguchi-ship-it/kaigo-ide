@@ -41,6 +41,7 @@ GitHub Pages 設定手順書は [docs/00_PROJECT/GITHUB_PAGES_SETUP_RUNBOOK.md](
   - 開発 / 個人運用 / 匿名化データ: `Gemini Developer API`
   - 本番 / 実データ / センシティブ情報: `Vertex AI`
 - GitHub Pages は公開済みです
+- Playwright の Chrome セッションが残留して再起動に失敗する場合は、`ms-playwright\\mcp-chrome*` の Chrome プロセスだけを停止してから再試行してください
 - 現在の worktree は dirty のままです
 - dirty 状態には、今回作業以外の未整理変更が含まれます
 

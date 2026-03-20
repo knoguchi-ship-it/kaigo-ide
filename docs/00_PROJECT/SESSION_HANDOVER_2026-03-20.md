@@ -20,6 +20,7 @@
 
 ## 直近の push 済みコミット
 
+- `8332f88` `Add session handover note`
 - `3ee5024` `Archive obsolete docs and transient screenshots`
 - `0884d48` `Document GitHub Pages hardening completion`
 - `aa6a72f` `Harden GitHub Pages delivery`
@@ -55,6 +56,8 @@
 - worktree は dirty のまま
 - この dirty 状態には、今回の Pages 作業以外の未整理変更も含まれる
 - 次担当者は既存の未コミット変更を勝手に戻さないこと
+- Playwright の Chrome セッション再起動に失敗する場合がある
+- 失敗時は `ms-playwright\\mcp-chrome*` を command line で特定し、該当 Chrome プロセスだけを停止してから再試行する
 
 現在確認できる未整理領域の例:
 - `apps/web/src/**`
