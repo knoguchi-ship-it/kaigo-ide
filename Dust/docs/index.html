@@ -32,6 +32,16 @@
       line-height: 1.6;
     }
 
+    .artifact-note {
+      margin-bottom: 24px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: #fff7ed;
+      border: 1px solid #fdba74;
+      color: #9a3412;
+      font-size: 0.9rem;
+    }
+
     /* Navigation */
     .nav {
       position: fixed;
@@ -553,6 +563,10 @@
 
 <!-- Main Content -->
 <main class="main">
+  <div class="artifact-note">
+    このページは要件・設計の可視化資料であり、現実装の完全な写像ではありません。
+    現在の実装状況は docs/HANDOVER.md と README.md を優先して参照してください。
+  </div>
 
   <!-- ==================== OVERVIEW ==================== -->
   <section id="overview" class="section">
@@ -1975,7 +1989,7 @@ type Status =
               <td>コンテナ化</td>
             </tr>
             <tr>
-              <td><strong>AWS / GCP / Azure</strong></td>
+              <td><strong>GCP</strong></td>
               <td>クラウドインフラ</td>
             </tr>
             <tr>

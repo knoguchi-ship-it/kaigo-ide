@@ -46,7 +46,7 @@
 #### インフラ
 ```
 ├── Docker + Kubernetes
-├── AWS / GCP / Azure
+├── GCP
 ├── CloudFront / Cloud CDN (静的配信)
 └── S3 / Cloud Storage (ファイル保存)
 ```

@@ -118,11 +118,12 @@ GitHub Pages 設定手順書は [docs/00_PROJECT/GITHUB_PAGES_SETUP_RUNBOOK.md](
 8. [docs/site/architecture/index.html](C:/VSCode/CloudePL/kaigoIDE/docs/site/architecture/index.html)
 9. [docs/site/operations/index.html](C:/VSCode/CloudePL/kaigoIDE/docs/site/operations/index.html)
 10. [docs/site/assets/css/site.css](C:/VSCode/CloudePL/kaigoIDE/docs/site/assets/css/site.css)
-11. [docs/site/assets/img/github-pages-public-404.png](C:/VSCode/CloudePL/kaigoIDE/docs/site/assets/img/github-pages-public-404.png)
-12. [docs/site/assets/img/github-pages-site-not-found.png](C:/VSCode/CloudePL/kaigoIDE/docs/site/assets/img/github-pages-site-not-found.png)
-13. [.editorconfig](C:/VSCode/CloudePL/kaigoIDE/.editorconfig)
-14. [.gitattributes](C:/VSCode/CloudePL/kaigoIDE/.gitattributes)
-15. [.github/workflows/pages.yml](C:/VSCode/CloudePL/kaigoIDE/.github/workflows/pages.yml)
+11. [docs/site/assets/img/github-pages-settings-after-github-actions.png](C:/VSCode/CloudePL/kaigoIDE/docs/site/assets/img/github-pages-settings-after-github-actions.png)
+12. [docs/site/assets/img/github-pages-actions-success.png](C:/VSCode/CloudePL/kaigoIDE/docs/site/assets/img/github-pages-actions-success.png)
+13. [docs/site/assets/img/github-pages-live-home.png](C:/VSCode/CloudePL/kaigoIDE/docs/site/assets/img/github-pages-live-home.png)
+14. [.editorconfig](C:/VSCode/CloudePL/kaigoIDE/.editorconfig)
+15. [.gitattributes](C:/VSCode/CloudePL/kaigoIDE/.gitattributes)
+16. [.github/workflows/pages.yml](C:/VSCode/CloudePL/kaigoIDE/.github/workflows/pages.yml)
 
 ## 文字コード状況
 

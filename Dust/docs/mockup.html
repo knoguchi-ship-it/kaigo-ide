@@ -52,6 +52,21 @@
       height: 100vh;
     }
 
+    .artifact-note {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 10000;
+      max-width: 420px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.92);
+      color: #f8fafc;
+      box-shadow: var(--shadow-md);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
     /* ---- Login Screen ---- */
     .login-screen {
       position: fixed;
@@ -897,6 +912,10 @@
   </style>
 </head>
 <body>
+  <div class="artifact-note">
+    このモックは target-state の UI 草案です。現実装とは一致しません。
+    現在の実装状況は docs/HANDOVER.md と README.md を参照してください。
+  </div>
 
 <!-- ==========================================
      LOGIN SCREEN
