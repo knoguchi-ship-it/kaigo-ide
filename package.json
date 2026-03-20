@@ -10,7 +10,8 @@
     "lint": "turbo lint",
     "test": "turbo test",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
-    "clean": "turbo clean"
+    "clean": "turbo clean",
+    "db:setup": "pnpm --filter @kaigo-ide/api db:generate && pnpm --filter @kaigo-ide/api db:migrate && pnpm --filter @kaigo-ide/api db:seed"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

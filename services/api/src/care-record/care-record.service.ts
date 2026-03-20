@@ -1,48 +1,73 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { FieldPath } from 'firebase-admin/firestore';
+import { CareRecordDao } from '../firestore/daos/care-record.dao';
+import { ClientDao } from '../firestore/daos/client.dao';
+import { FirestoreService } from '../firestore/firestore.service';
+import { toIsoString } from '../firestore/firestore.utils';
 import { CreateCareRecordDto } from './dto/create-care-record.dto';
 import { UpdateCareRecordDto } from './dto/update-care-record.dto';
 import { CareRecordQueryDto } from './dto/care-record-query.dto';
-import type { Prisma } from '@prisma/client';
+import { AuditLogService } from '../audit/audit-log.service';
 
 @Injectable()
 export class CareRecordService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly firestore: FirestoreService,
+    private readonly careRecordDao: CareRecordDao,
+    private readonly clientDao: ClientDao,
+    private readonly auditLog: AuditLogService,
+  ) {}
 
   async findAll(clientId: string, query: CareRecordQueryDto, tenantId: string) {
-    // テナント分離: clientが対象テナントに属することを検証
-    const where: Prisma.CareRecordWhereInput = {
-      clientId,
-      client: { tenantId },
-    };
-
-    if (query.category) {
-      where.category = query.category;
-    }
-    if (query.from || query.to) {
-      where.recordDate = {};
-      if (query.from) where.recordDate.gte = new Date(query.from);
-      if (query.to) where.recordDate.lte = new Date(query.to);
-    }
-    if (query.keyword) {
-      where.content = { contains: query.keyword, mode: 'insensitive' };
-    }
-
     const page = Math.max(1, query.page ?? 1);
     const limit = Math.min(100, Math.max(1, query.limit ?? 20));
 
-    const [records, total] = await Promise.all([
-      this.prisma.careRecord.findMany({
-        where,
-        orderBy: { recordDate: 'desc' },
-        skip: (page - 1) * limit,
-        take: limit,
-        include: { client: true },
-      }),
-      this.prisma.careRecord.count({ where }),
-    ]);
+    const from = query.from ? new Date(query.from) : undefined;
+    const to = query.to ? new Date(query.to) : undefined;
 
-    const data = records.map((r) => ({ ...r, recordType: 'GENERAL' as const }));
+    const records = await this.careRecordDao.listCareRecords(tenantId, clientId, {
+      category: query.category,
+      from,
+      to,
+      limit,
+      offset: (page - 1) * limit,
+    });
+
+    let filtered = records;
+    if (query.keyword) {
+      const keyword = query.keyword.toLowerCase();
+      filtered = records.filter((r) =>
+        String(r.content ?? '').toLowerCase().includes(keyword),
+      );
+    }
+
+    const db = this.firestore.firestore;
+    let total = filtered.length;
+    if (!query.keyword) {
+      const baseQuery = db
+        .collection('tenants')
+        .doc(tenantId)
+        .collection('clients')
+        .doc(clientId)
+        .collection('careRecords')
+        .orderBy('recordDate', 'desc');
+
+      let countQuery = baseQuery;
+      if (query.category) countQuery = countQuery.where('category', '==', query.category);
+      if (from) countQuery = countQuery.where('recordDate', '>=', from);
+      if (to) countQuery = countQuery.where('recordDate', '<=', to);
+
+      const countSnap = await countQuery.count().get();
+      total = countSnap.data().count;
+    }
+
+    const data = filtered.map((r) => ({
+      ...r,
+      recordType: 'GENERAL' as const,
+      recordDate: toIsoString(r.recordDate) ?? r.recordDate,
+      createdAt: toIsoString(r.createdAt) ?? r.createdAt,
+      updatedAt: toIsoString(r.updatedAt) ?? r.updatedAt,
+    }));
 
     return {
       data,
@@ -51,40 +76,77 @@ export class CareRecordService {
   }
 
   async findOne(id: string, tenantId: string) {
-    const record = await this.prisma.careRecord.findUnique({
-      where: { id },
-      include: { client: true },
-    });
-    if (!record) throw new NotFoundException('記録が見つかりません');
-    if (record.client.tenantId !== tenantId) throw new ForbiddenException();
-    return { ...record, recordType: 'GENERAL' as const };
+    const db = this.firestore.firestore;
+    const snap = await db
+      .collectionGroup('careRecords')
+      .where(FieldPath.documentId(), '==', id)
+      .limit(1)
+      .get();
+    if (snap.empty) throw new NotFoundException('險倬鹸縺瑚ｦ九▽縺九ｊ縺ｾ縺帙ｓ');
+    const doc = snap.docs[0];
+    const data = doc.data();
+    if (data.tenantId !== tenantId) throw new ForbiddenException();
+
+    return {
+      id: doc.id,
+      ...data,
+      recordType: 'GENERAL' as const,
+      recordDate: toIsoString(data.recordDate) ?? data.recordDate,
+      createdAt: toIsoString(data.createdAt) ?? data.createdAt,
+      updatedAt: toIsoString(data.updatedAt) ?? data.updatedAt,
+    };
   }
 
-  async create(clientId: string, dto: CreateCareRecordDto, createdById: string, tenantId: string) {
-    // テナント検証: clientが対象テナントに属することを確認
-    const client = await this.prisma.client.findUnique({ where: { id: clientId } });
-    if (!client || client.tenantId !== tenantId) throw new ForbiddenException();
+  async create(
+    clientId: string,
+    dto: CreateCareRecordDto,
+    createdById: string,
+    tenantId: string,
+    req?: import('express').Request,
+  ) {
+    const client = await this.clientDao.getClient(tenantId, clientId);
+    if (!client) throw new ForbiddenException();
 
-    const record = await this.prisma.careRecord.create({
-      data: {
-        clientId,
-        recordDate: new Date(dto.recordDate),
-        category: dto.category,
-        content: dto.content,
-        relatedOrganization: dto.relatedOrganization,
-        professionalJudgment: dto.professionalJudgment,
-        clientFamilyOpinion: dto.clientFamilyOpinion,
-        createdById,
-      },
+    const { id } = await this.careRecordDao.createCareRecord(tenantId, clientId, {
+      tenantId,
+      clientId,
+      recordDate: new Date(dto.recordDate),
+      category: dto.category,
+      content: dto.content,
+      relatedOrganization: dto.relatedOrganization,
+      professionalJudgment: dto.professionalJudgment,
+      clientFamilyOpinion: dto.clientFamilyOpinion,
+      createdById,
     });
-    return { ...record, recordType: 'GENERAL' as const };
+
+    this.auditLog.log({
+      eventType: 'CARE_RECORD_CREATE',
+      tenantId,
+      clientId,
+      resourceId: id,
+      userId: createdById,
+      result: 'SUCCESS',
+    }, req);
+
+    return this.findOne(id, tenantId);
   }
 
-  async update(id: string, dto: UpdateCareRecordDto, tenantId: string) {
-    await this.findOne(id, tenantId);
-    return this.prisma.careRecord.update({
-      where: { id },
-      data: {
+  async update(
+    id: string,
+    dto: UpdateCareRecordDto,
+    tenantId: string,
+    req?: import('express').Request,
+  ) {
+    const db = this.firestore.firestore;
+    const snap = await db
+      .collectionGroup('careRecords')
+      .where(FieldPath.documentId(), '==', id)
+      .limit(1)
+      .get();
+    const doc = snap.docs[0];
+
+    await doc.ref.set(
+      {
         ...(dto.recordDate !== undefined && { recordDate: new Date(dto.recordDate) }),
         ...(dto.category !== undefined && { category: dto.category }),
         ...(dto.content !== undefined && { content: dto.content }),
@@ -97,48 +159,75 @@ export class CareRecordService {
         ...(dto.clientFamilyOpinion !== undefined && {
           clientFamilyOpinion: dto.clientFamilyOpinion,
         }),
+        updatedAt: new Date(),
       },
-    });
+      { merge: true },
+    );
+
+    this.auditLog.log({
+      eventType: 'CARE_RECORD_UPDATE',
+      tenantId,
+      resourceId: id,
+      result: 'SUCCESS',
+    }, req);
+
+    return this.findOne(id, tenantId);
   }
 
-  async remove(id: string, tenantId: string) {
+  async remove(id: string, tenantId: string, req?: import('express').Request) {
     await this.findOne(id, tenantId);
-    return this.prisma.careRecord.delete({ where: { id } });
+    const db = this.firestore.firestore;
+    const snap = await db
+      .collectionGroup('careRecords')
+      .where(FieldPath.documentId(), '==', id)
+      .limit(1)
+      .get();
+    const doc = snap.docs[0];
+    await doc.ref.delete();
+    this.auditLog.log({
+      eventType: 'CARE_RECORD_DELETE',
+      tenantId,
+      resourceId: id,
+      result: 'SUCCESS',
+    }, req);
+    return { id };
   }
 
-  /**
-   * PDF出力用: ページネーションなし、上限1000件で全件取得
-   */
   async findForExport(
     clientId: string,
     dateRange: { from?: string; to?: string },
     tenantId: string,
   ) {
-    const client = await this.prisma.client.findUnique({
-      where: { id: clientId },
-    });
-    if (!client || client.tenantId !== tenantId) {
-      throw new ForbiddenException();
-    }
+    const client = await this.clientDao.getClient(tenantId, clientId);
+    if (!client) throw new ForbiddenException();
 
-    const where: Prisma.CareRecordWhereInput = {
-      clientId,
-      client: { tenantId },
+    const from = dateRange.from ? new Date(dateRange.from) : undefined;
+    const to = dateRange.to ? new Date(dateRange.to) : undefined;
+
+    const records = await this.careRecordDao.listCareRecords(tenantId, clientId, {
+      from,
+      to,
+      limit: 1000,
+    });
+
+    const normalizedClient = {
+      ...client,
+      tenantId,
+      birthDate: toIsoString(client.birthDate) ?? client.birthDate,
+      certificationDate: toIsoString(client.certificationDate) ?? client.certificationDate,
+      createdAt: toIsoString(client.createdAt) ?? client.createdAt,
+      updatedAt: toIsoString(client.updatedAt) ?? client.updatedAt,
     };
 
-    if (dateRange.from || dateRange.to) {
-      where.recordDate = {};
-      if (dateRange.from) where.recordDate.gte = new Date(dateRange.from);
-      if (dateRange.to) where.recordDate.lte = new Date(dateRange.to);
-    }
+    const normalizedRecords = records.map((r) => ({
+      ...r,
+      recordType: 'GENERAL' as const,
+      recordDate: toIsoString(r.recordDate) ?? r.recordDate,
+      createdAt: toIsoString(r.createdAt) ?? r.createdAt,
+      updatedAt: toIsoString(r.updatedAt) ?? r.updatedAt,
+      client: normalizedClient,
+    }));
 
-    const records = await this.prisma.careRecord.findMany({
-      where,
-      orderBy: { recordDate: 'desc' },
-      take: 1000,
-      include: { client: true },
-    });
-
-    return { client, records };
+    return { client: normalizedClient, records: normalizedRecords };
   }
 }

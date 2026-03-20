@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Req } from '@nestjs/common';
 import { CarePlanService } from './care-plan.service';
 import { CreateCarePlanDto } from './dto/create-care-plan.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser, AuthUser } from '../auth/decorators/current-user.decorator';
+import type { Request } from 'express';
 
 @Controller('clients/:clientId/care-plans')
 @UseGuards(JwtAuthGuard)
@@ -24,7 +25,8 @@ export class CarePlanController {
     @Param('clientId') clientId: string,
     @Body() dto: CreateCarePlanDto,
     @CurrentUser() user: AuthUser,
+    @Req() req: Request,
   ) {
-    return this.carePlanService.create(clientId, dto, user.tenantId);
+    return this.carePlanService.create(clientId, dto, user.tenantId, req);
   }
 }

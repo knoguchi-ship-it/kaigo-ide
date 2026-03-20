@@ -1,4 +1,5 @@
-const API_BASE = '/api';
+const API_BASE =
+  import.meta.env.VITE_API_BASE?.replace(/\/$/, '') || '/api';
 
 class ApiError extends Error {
   constructor(
@@ -148,3 +149,5 @@ export const api = {
 
   getBlob: (path: string) => requestBlob(path),
 };
+
+export { API_BASE };

@@ -1,5 +1,5 @@
 import { IsString, IsEnum, IsDateString, IsOptional } from 'class-validator';
-import { Gender, CareLevel } from '@prisma/client';
+import { Gender, CareLevel } from '../../common/enums';
 
 export class CreateClientDto {
   @IsString()

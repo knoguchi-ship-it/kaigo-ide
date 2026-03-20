@@ -1,0 +1,42 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "careRecords",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "category", "order": "ASCENDING" },
+        { "fieldPath": "recordDate", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "careRecords",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "recordDate", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "monitoringRecords",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "recordDate", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "carePlans",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "version", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "clients",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "familyNameKana", "order": "ASCENDING" },
+        { "fieldPath": "givenNameKana", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { PrismaModule } from './prisma/prisma.module';
+import { FirestoreModule } from './firestore/firestore.module';
+import { AuditModule } from './audit/audit.module';
 import { CareRecordModule } from './care-record/care-record.module';
 import { MonitoringRecordModule } from './monitoring-record/monitoring-record.module';
 import { ClientModule } from './client/client.module';
@@ -11,7 +12,8 @@ import { AiModule } from './ai/ai.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    PrismaModule,
+    AuditModule,
+    FirestoreModule,
     AuthModule,
     ClientModule,
     CarePlanModule,

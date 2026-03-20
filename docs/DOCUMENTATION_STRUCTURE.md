@@ -5,6 +5,10 @@
 ```
 docs/
 ├── 00_PROJECT/                      # プロジェクト管理
+│   ├── PROJECT_GROUND_RULES.md      # リポジトリ最上位ルール
+│   ├── ENCODING_POLICY.md           # 文字コード方針
+│   ├── DOCUMENT_SITE_PLAN.md        # ドキュメントサイト計画
+│   ├── GITHUB_PAGES_PLAN.md         # GitHub Pages 公開計画
 │   ├── SOW.md                       # Statement of Work（作業範囲記述書）
 │   ├── PROJECT_CHARTER.md           # プロジェクト憲章
 │   └── STAKEHOLDERS.md              # ステークホルダー一覧
@@ -55,8 +59,12 @@ docs/
 │
 ├── CHANGELOG.md                     # 変更履歴
 ├── GLOSSARY.md                      # 用語集
-└── SPECIFICATION_DRAFT.md           # 仕様草案（現在のファイル）
+└── SPECIFICATION_DRAFT.md           # 仕様草案（現在は Dust へ退避）
 ```
+
+補足:
+- `docs/site/` は Markdown 正本を視覚的に案内するための静的ドキュメントサイト領域
+- 現在の接続済みページは `index` / `governance` / `encoding` / `handover` / `architecture` / `operations`
 
 ---
 

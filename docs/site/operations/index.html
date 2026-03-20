@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KaigoIDE Docs | 運用</title>
+  <link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">本文へ移動</a>
+  <div class="site-shell">
+    <nav class="site-nav" aria-label="サイトナビゲーション">
+      <a class="brand" href="../index.html">
+        <span class="brand-mark">KAIGOIDE DOCS</span>
+        <div class="brand-title">KaigoIDE</div>
+        <p class="brand-copy">GCP 主軸の運用方針と本番前提の注意点をまとめたページです。</p>
+      </a>
+
+      <div class="nav-group">
+        <div class="nav-label">Pages</div>
+        <div class="nav-list">
+          <a class="nav-link" href="../index.html">ホーム<small>全体導線</small></a>
+          <a class="nav-link" href="../governance/index.html">ガバナンス<small>ルールと手順</small></a>
+          <a class="nav-link" href="../encoding/index.html">文字コード<small>原因と改善策</small></a>
+          <a class="nav-link" href="../handover/index.html">引き継ぎ<small>現在地と次の着手点</small></a>
+          <a class="nav-link" href="../architecture/index.html">設計<small>現行構成と正本導線</small></a>
+          <a class="nav-link" href="./index.html" aria-current="page">運用<small>環境と運用注意点</small></a>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">Primary Docs</div>
+        <div class="nav-list">
+          <a class="nav-link" href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/README.md">正本: README</a>
+          <a class="nav-link" href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/HANDOVER.md">正本: HANDOVER</a>
+          <a class="nav-link" href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/services/api/.env.production.example">本番 env テンプレート</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="site-main" id="main-content">
+      <header class="page-header">
+        <span class="eyebrow">Operations</span>
+        <h1>GCP 主軸の運用前提を揃える</h1>
+        <p>このページは、個人開発から本番運用までの AI / 認証 / Firestore / 環境変数の前提を短く把握するための要約です。</p>
+      </header>
+
+      <section class="summary-box">
+        <h2>結論</h2>
+        <p>個人開発では `Gemini Developer API`、本番や実データでは `Vertex AI` を使います。production では `DEV_LOGIN_ENABLED=false` を維持します。</p>
+      </section>
+
+      <section class="layout-grid cards-2 section">
+        <article class="card">
+          <h2>開発 / 個人運用</h2>
+          <ul class="status-list">
+            <li>`AI_PROVIDER=gemini`</li>
+            <li>匿名化データのみを前提</li>
+            <li>Firestore + local dev</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>本番 / 実データ</h2>
+          <ul class="status-list">
+            <li>`AI_PROVIDER=vertex`</li>
+            <li>`DEV_LOGIN_ENABLED=false`</li>
+            <li>GCP 認証と環境変数バリデーション必須</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="two-column section">
+        <div class="summary-box">
+          <h2>本番前チェック</h2>
+          <ol class="check-list">
+            <li>Firestore と Vertex AI の GCP プロジェクト整合を確認する</li>
+            <li>service account か metadata 認証を固定する</li>
+            <li>開発ログインが無効になっていることを確認する</li>
+            <li>Cloud Run 前提の環境変数を確認する</li>
+          </ol>
+        </div>
+
+        <div class="summary-box warn">
+          <h2>参照先</h2>
+          <ul class="link-list">
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/README.md">README.md</a></li>
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/HANDOVER.md">HANDOVER.md</a></li>
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/services/api/.env.production.example">.env.production.example</a></li>
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/00_PROJECT/PROJECT_GROUND_RULES.md">PROJECT_GROUND_RULES.md</a></li>
+          </ul>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div>Last updated: 2026-03-20</div>
+        <div>本番方針の正本は <a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/HANDOVER.md">HANDOVER.md</a> と <a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/README.md">README.md</a> です。</div>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>

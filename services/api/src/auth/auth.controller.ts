@@ -10,8 +10,8 @@ export class AuthController {
 
   /** 開発環境用: メールでログイン（パスワード不要） */
   @Post('dev-login')
-  async devLogin(@Body('email') email: string) {
-    return this.authService.devLogin(email);
+  async devLogin(@Body('email') email: string, @Req() req: Request) {
+    return this.authService.devLogin(email, req);
   }
 
   /** Google OAuth: リダイレクト開始 */
@@ -31,7 +31,7 @@ export class AuthController {
       accessToken: string;
       refreshToken?: string;
     };
-    const tokens = await this.authService.loginWithGoogle(user);
+    const tokens = await this.authService.loginWithGoogle(user, req);
 
     // フロントエンドにトークンを渡す（URLフラグメント経由 - サーバーログに残らない）
     const frontendUrl = process.env.CORS_ORIGIN || 'http://localhost:3000';
@@ -42,8 +42,8 @@ export class AuthController {
 
   /** トークンリフレッシュ */
   @Post('refresh')
-  async refresh(@Body('refreshToken') refreshToken: string) {
-    return this.authService.refreshAccessToken(refreshToken);
+  async refresh(@Body('refreshToken') refreshToken: string, @Req() req: Request) {
+    return this.authService.refreshAccessToken(refreshToken, req);
   }
 
   /** 認証状態確認 */

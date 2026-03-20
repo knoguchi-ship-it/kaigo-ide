@@ -1,5 +1,5 @@
 import { IsString, IsEnum, IsDateString, IsOptional, MaxLength } from 'class-validator';
-import { CareRecordCategory } from '@prisma/client';
+import { CareRecordCategory } from '../../common/enums';
 
 export class CreateCareRecordDto {
   @IsDateString()

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KaigoIDE Docs | ガバナンス</title>
+  <link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">本文へ移動</a>
+  <div class="site-shell">
+    <nav class="site-nav" aria-label="サイトナビゲーション">
+      <a class="brand" href="../index.html">
+        <span class="brand-mark">KAIGOIDE DOCS</span>
+        <div class="brand-title">KaigoIDE</div>
+        <p class="brand-copy">ルールを最優先で読めるように整理したページです。</p>
+      </a>
+
+      <div class="nav-group">
+        <div class="nav-label">Pages</div>
+        <div class="nav-list">
+          <a class="nav-link" href="../index.html">ホーム<small>全体導線</small></a>
+          <a class="nav-link" href="./index.html" aria-current="page">ガバナンス<small>ルールと手順</small></a>
+          <a class="nav-link" href="../encoding/index.html">文字コード<small>文字化けの切り分け</small></a>
+          <a class="nav-link" href="../handover/index.html">引き継ぎ<small>現在地と次の着手点</small></a>
+          <a class="nav-link" href="../architecture/index.html">設計<small>現行構成と正本導線</small></a>
+          <a class="nav-link" href="../operations/index.html">運用<small>環境と運用注意点</small></a>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">Primary Docs</div>
+        <div class="nav-list">
+          <a class="nav-link" href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/00_PROJECT/PROJECT_GROUND_RULES.md">正本: グランドルール</a>
+          <a class="nav-link" href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/HANDOVER.md">正本: 引き継ぎ書</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="site-main" id="main-content">
+      <header class="page-header">
+        <span class="eyebrow">Governance</span>
+        <h1>開発をブレさせないための運用基準</h1>
+        <p>このページは、プロジェクト・グランドルールを人が短時間で把握するための要約です。正本は Markdown です。</p>
+      </header>
+
+      <section class="summary-box">
+        <h2>結論</h2>
+        <p>KaigoIDE では、最新情報の Web 調査、根拠付き提案、明示承認、ドキュメント先行更新、誤解のない handover を必須とします。</p>
+      </section>
+
+      <section class="layout-grid cards-3 section">
+        <article class="card">
+          <h2>Research First</h2>
+          <p>設計、実装方針、セキュリティ、クラウド構成、API 設計は、実行日時点の最新情報を Web で確認してから着手します。</p>
+        </article>
+
+        <article class="card">
+          <h2>Proposal First</h2>
+          <p>実装前に、根拠付きのベストプラクティス提案を出し、推奨案と代替案を整理します。</p>
+        </article>
+
+        <article class="card">
+          <h2>Docs First</h2>
+          <p>コード変更より先に、要件、設計、運用、環境設定、handover の文書を更新します。</p>
+        </article>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">標準作業順序</h2>
+        <ol class="check-list">
+          <li>Web で最新情報を調査する</li>
+          <li>根拠付きでベストプラクティス提案を行う</li>
+          <li>明示的な承認を得る</li>
+          <li>関連ドキュメントを先に更新する</li>
+          <li>実装する</li>
+          <li>検証する</li>
+          <li>必要に応じて引き継ぎ文書を更新する</li>
+        </ol>
+      </section>
+
+      <section class="two-column section">
+        <div class="summary-box danger">
+          <h2>禁止事項</h2>
+          <ul class="check-list">
+            <li>記憶だけで設計判断する</li>
+            <li>提案前に実装する</li>
+            <li>承認前にコードを書き進める</li>
+            <li>ドキュメント更新を後回しにする</li>
+            <li>曖昧な handover を残す</li>
+          </ul>
+        </div>
+
+        <div class="summary-box">
+          <h2>正本への導線</h2>
+          <ul class="link-list">
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/00_PROJECT/PROJECT_GROUND_RULES.md">プロジェクト・グランドルール</a></li>
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/HANDOVER.md">引き継ぎ書</a></li>
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/README.md">README</a></li>
+          </ul>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div>Last updated: 2026-03-20</div>
+        <div>正本は <a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/00_PROJECT/PROJECT_GROUND_RULES.md">PROJECT_GROUND_RULES.md</a> です。</div>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>

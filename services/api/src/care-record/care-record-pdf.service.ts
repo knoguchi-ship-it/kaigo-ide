@@ -1,11 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { PdfService } from '../pdf/pdf.service';
 import type { TDocumentDefinitions, ContentTable, TableCell } from 'pdfmake/interfaces';
-import type { CareRecord, Client } from '@prisma/client';
 
-interface RecordWithClient extends CareRecord {
-  client: Client;
+interface PdfClient {
+  id: string;
+  familyName: string;
+  givenName: string;
 }
+
+interface PdfCareRecord {
+  recordDate: string | Date;
+  category: string;
+  content: string;
+  professionalJudgment?: string | null;
+  clientFamilyOpinion?: string | null;
+  relatedOrganization?: string | null;
+  client: PdfClient;
+}
+
+type RecordWithClient = PdfCareRecord;
 
 const CATEGORY_LABELS: Record<string, string> = {
   VISIT: '訪問',
@@ -48,7 +61,7 @@ export class CareRecordPdfService {
   constructor(private readonly pdfService: PdfService) {}
 
   async generateTable5Pdf(
-    client: Client,
+    client: PdfClient,
     records: RecordWithClient[],
     authorName: string,
     dateRange: { from?: string; to?: string },
@@ -63,7 +76,7 @@ export class CareRecordPdfService {
   }
 
   private buildDocDefinition(
-    client: Client,
+    client: PdfClient,
     records: RecordWithClient[],
     authorName: string,
     dateRange: { from?: string; to?: string },
@@ -122,7 +135,7 @@ export class CareRecordPdfService {
   }
 
   private buildHeaderInfo(
-    client: Client,
+    client: PdfClient,
     authorName: string,
     dateRange: { from?: string; to?: string },
   ) {

@@ -8,7 +8,7 @@ import {
   IsInt,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { GoalType } from '@prisma/client';
+import { GoalType } from '../../common/enums';
 
 class GoalDto {
   @IsEnum(GoalType)

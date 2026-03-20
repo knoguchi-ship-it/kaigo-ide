@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api } from '../lib/api-client';
+import { api, API_BASE } from '../lib/api-client';
 import { useAuthStore } from '../stores/auth-store';
 import type { AuthResponse } from '@kaigo-ide/types';
 
@@ -28,7 +28,7 @@ export function LoginPage() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = '/api/auth/google';
+    window.location.href = `${API_BASE}/auth/google`;
   };
 
   return (

@@ -9,6 +9,7 @@ import {
   Query,
   Res,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { CareRecordService } from './care-record.service';
@@ -19,6 +20,7 @@ import { CareRecordQueryDto } from './dto/care-record-query.dto';
 import { ExportPdfQueryDto } from './dto/export-pdf-query.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser, AuthUser } from '../auth/decorators/current-user.decorator';
+import type { Request } from 'express';
 
 @Controller('clients/:clientId/care-records')
 @UseGuards(JwtAuthGuard)
@@ -51,8 +53,8 @@ export class CareRecordController {
     );
 
     const pdfBuffer = await this.careRecordPdfService.generateTable5Pdf(
-      client,
-      records,
+      client as any,
+      records as any,
       user.name,
       { from: query.from, to: query.to },
     );
@@ -78,8 +80,9 @@ export class CareRecordController {
     @Param('clientId') clientId: string,
     @Body() dto: CreateCareRecordDto,
     @CurrentUser() user: AuthUser,
+    @Req() req: Request,
   ) {
-    return this.careRecordService.create(clientId, dto, user.id, user.tenantId);
+    return this.careRecordService.create(clientId, dto, user.id, user.tenantId, req);
   }
 
   @Patch(':id')
@@ -87,12 +90,13 @@ export class CareRecordController {
     @Param('id') id: string,
     @Body() dto: UpdateCareRecordDto,
     @CurrentUser() user: AuthUser,
+    @Req() req: Request,
   ) {
-    return this.careRecordService.update(id, dto, user.tenantId);
+    return this.careRecordService.update(id, dto, user.tenantId, req);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @CurrentUser() user: AuthUser) {
-    return this.careRecordService.remove(id, user.tenantId);
+  remove(@Param('id') id: string, @CurrentUser() user: AuthUser, @Req() req: Request) {
+    return this.careRecordService.remove(id, user.tenantId, req);
   }
 }

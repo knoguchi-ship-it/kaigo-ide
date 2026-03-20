@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { api } from '../lib/api-client';
+import { api, API_BASE } from '../lib/api-client';
 import type { AiGenerateRequest, AiGenerateResponse } from '@kaigo-ide/types';
 
 interface UseAiGenerateReturn {
@@ -38,7 +38,7 @@ export function useAiGenerate(): UseAiGenerateReturn {
 
       try {
         const token = localStorage.getItem('access_token');
-        const response = await fetch('/api/ai/generate/stream', {
+        const response = await fetch(`${API_BASE}/ai/generate/stream`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

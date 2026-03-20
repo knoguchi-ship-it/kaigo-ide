@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { API_BASE } from '../lib/api-client';
 import type { User } from '@kaigo-ide/types';
 
 interface AuthState {
@@ -37,7 +38,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         // 期限切れ → refreshトークンで更新を試みる
         const refreshToken = localStorage.getItem('refresh_token');
         if (refreshToken) {
-          fetch('/api/auth/refresh', {
+          fetch(`${API_BASE}/auth/refresh`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ refreshToken }),

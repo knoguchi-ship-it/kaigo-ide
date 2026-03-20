@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KaigoIDE Docs</title>
+  <link rel="stylesheet" href="./assets/css/site.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">本文へ移動</a>
+  <div class="site-shell">
+    <nav class="site-nav" aria-label="サイトナビゲーション">
+      <a class="brand" href="./index.html">
+        <span class="brand-mark">KAIGOIDE DOCS</span>
+        <div class="brand-title">KaigoIDE</div>
+        <p class="brand-copy">プロジェクト文書を 1 つのサイトとして読むための入口です。</p>
+      </a>
+
+      <div class="nav-group">
+        <div class="nav-label">Pages</div>
+        <div class="nav-list">
+          <a class="nav-link" href="./index.html" aria-current="page">ホーム<small>現在地と全体導線</small></a>
+          <a class="nav-link" href="./governance/index.html">ガバナンス<small>グランドルールと標準作業順序</small></a>
+          <a class="nav-link" href="./encoding/index.html">文字コード<small>文字化けの原因と対策</small></a>
+          <a class="nav-link" href="./handover/index.html">引き継ぎ<small>現在地と次の着手点</small></a>
+          <a class="nav-link" href="./architecture/index.html">設計<small>現行構成と正本導線</small></a>
+          <a class="nav-link" href="./operations/index.html">運用<small>環境と運用注意点</small></a>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">Sources</div>
+        <div class="nav-list">
+          <a class="nav-link" href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/00_PROJECT/PROJECT_GROUND_RULES.md">正本: グランドルール</a>
+          <a class="nav-link" href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/00_PROJECT/ENCODING_POLICY.md">正本: 文字コード方針</a>
+          <a class="nav-link" href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/HANDOVER.md">正本: 引き継ぎ書</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="site-main" id="main-content">
+      <header class="hero">
+        <span class="eyebrow">Documentation Portal</span>
+        <h1>文書を迷わず読むための共通入口</h1>
+        <p>KaigoIDE の運用ルール、現在地、文字コード方針を、Markdown の正本と視覚ページの両方から理解できるように整理した静的ドキュメントサイトです。</p>
+        <div class="tag-row">
+          <span class="tag accent">正本は Markdown</span>
+          <span class="tag warn">HTML は視覚導線</span>
+          <span class="tag accent">UTF-8 前提</span>
+        </div>
+      </header>
+
+      <section class="layout-grid cards-3" aria-label="要点カード">
+        <article class="card">
+          <h2>最重要ルール</h2>
+          <p>着手前に最新情報を Web で確認し、根拠付き提案を出し、承認後に docs-first で進めます。</p>
+          <ul class="status-list">
+            <li>Web 調査必須</li>
+            <li>提案必須</li>
+            <li>承認前実装禁止</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>現在地</h2>
+          <p>現行 API は Firestore ベースで、AI は `dev=Gemini Developer API`、`prod target=Vertex AI` の方針です。</p>
+          <ul class="status-list">
+            <li>支援経過記録 API 実装済み</li>
+            <li>モニタリング入力 API 実装済み</li>
+            <li>担当者会議は未実装</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>今の重点</h2>
+          <p>文字化けは「表示問題」と「実ファイル破損」を分けて扱い、再発防止の設定を固定します。</p>
+          <ul class="status-list">
+            <li>UTF-8 を標準化</li>
+            <li>`.editorconfig` 導入</li>
+            <li>`.gitattributes` 導入</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">ページ一覧</h2>
+        <div class="layout-grid cards-3">
+          <article class="card">
+            <h3>ガバナンス</h3>
+            <p>グランドルール、標準作業順序、承認前に実装してはならない理由を要約します。</p>
+            <p><a href="./governance/index.html">ガバナンスページへ</a></p>
+          </article>
+          <article class="card">
+            <h3>文字コード</h3>
+            <p>文字化けの原因、影響範囲、修復順序、再発防止策を整理します。</p>
+            <p><a href="./encoding/index.html">文字コードページへ</a></p>
+          </article>
+          <article class="card">
+            <h3>引き継ぎ</h3>
+            <p>現在の実装状況、次の優先課題、読むべき正本をまとめて確認できます。</p>
+            <p><a href="./handover/index.html">引き継ぎページへ</a></p>
+          </article>
+          <article class="card">
+            <h3>設計</h3>
+            <p>現行アーキテクチャと target state 文書の読み分けを整理します。</p>
+            <p><a href="./architecture/index.html">設計ページへ</a></p>
+          </article>
+          <article class="card">
+            <h3>運用</h3>
+            <p>GCP 主軸の運用方針、AI 切替、production 注意点をまとめます。</p>
+            <p><a href="./operations/index.html">運用ページへ</a></p>
+          </article>
+        </div>
+      </section>
+
+      <section class="two-column section">
+        <div class="summary-box">
+          <h2>まず読むべき正本</h2>
+          <ul class="link-list">
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/00_PROJECT/PROJECT_GROUND_RULES.md">プロジェクト・グランドルール</a></li>
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/00_PROJECT/ENCODING_POLICY.md">文字コード方針</a></li>
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/HANDOVER.md">引き継ぎ書</a></li>
+          </ul>
+        </div>
+
+        <aside class="summary-box warn">
+          <h2>次の拡張予定</h2>
+          <ul class="check-list">
+            <li>パンくず導線</li>
+            <li>セクション内アンカー</li>
+            <li>GitHub Pages 前提の構成整理</li>
+          </ul>
+        </aside>
+      </section>
+
+      <footer class="footer">
+        <div>Last updated: 2026-03-20</div>
+        <div>この HTML は視覚導線です。正本は Markdown にあります。</div>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>

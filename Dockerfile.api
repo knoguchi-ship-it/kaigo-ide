@@ -1,0 +1,23 @@
+FROM node:20-slim AS base
+RUN corepack enable
+
+FROM base AS builder
+WORKDIR /app
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY packages ./packages
+COPY services/api ./services/api
+RUN pnpm --filter @kaigo-ide/api... install --frozen-lockfile
+RUN pnpm --filter @kaigo-ide/api db:generate
+RUN pnpm --filter @kaigo-ide/api build
+
+FROM base AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY packages ./packages
+COPY services/api ./services/api
+RUN pnpm --filter @kaigo-ide/api... install --frozen-lockfile --prod
+RUN pnpm --filter @kaigo-ide/api db:generate
+COPY --from=builder /app/services/api/dist ./services/api/dist
+EXPOSE 8080
+CMD ["node", "services/api/dist/main"]

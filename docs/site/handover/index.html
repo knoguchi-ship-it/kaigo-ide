@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KaigoIDE Docs | 引き継ぎ</title>
+  <link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">本文へ移動</a>
+  <div class="site-shell">
+    <nav class="site-nav" aria-label="サイトナビゲーション">
+      <a class="brand" href="../index.html">
+        <span class="brand-mark">KAIGOIDE DOCS</span>
+        <div class="brand-title">KaigoIDE</div>
+        <p class="brand-copy">次の担当者が迷わず続行できるように整理したページです。</p>
+      </a>
+
+      <div class="nav-group">
+        <div class="nav-label">Pages</div>
+        <div class="nav-list">
+          <a class="nav-link" href="../index.html">ホーム<small>全体導線</small></a>
+          <a class="nav-link" href="../governance/index.html">ガバナンス<small>ルールと手順</small></a>
+          <a class="nav-link" href="../encoding/index.html">文字コード<small>原因と改善策</small></a>
+          <a class="nav-link" href="./index.html" aria-current="page">引き継ぎ<small>現在地と次の着手点</small></a>
+          <a class="nav-link" href="../architecture/index.html">設計<small>現行構成と正本導線</small></a>
+          <a class="nav-link" href="../operations/index.html">運用<small>環境と運用注意点</small></a>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">Primary Docs</div>
+        <div class="nav-list">
+          <a class="nav-link" href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/HANDOVER.md">正本: 引き継ぎ書</a>
+          <a class="nav-link" href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/HANDOVER_CURRENT.md">差分メモ</a>
+          <a class="nav-link" href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/00_PROJECT/PROJECT_GROUND_RULES.md">正本: グランドルール</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="site-main" id="main-content">
+      <header class="page-header">
+        <span class="eyebrow">Handover</span>
+        <h1>現在地と次の着手点を短時間で把握する</h1>
+        <p>このページは、現状の正本 handover を視覚的に読みやすくするための要約です。詳細は Markdown の正本を参照します。</p>
+      </header>
+
+      <section class="summary-box">
+        <h2>結論</h2>
+        <p>現行 API は Firestore ベースで、AI は `dev=Gemini Developer API`、`prod target=Vertex AI` の方針です。次の優先課題は OpenAPI 正本化、認証の cookie 化、文字化け修復、自動テスト整備です。</p>
+      </section>
+
+      <section class="layout-grid cards-2 section">
+        <article class="card">
+          <h2>実装済み</h2>
+          <ul class="status-list">
+            <li>認証</li>
+            <li>利用者管理</li>
+            <li>ケアプラン簡易管理</li>
+            <li>支援経過記録</li>
+            <li>モニタリング入力 API</li>
+            <li>AI 生成 API</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>未実装 / 未完了</h2>
+          <ul class="status-list">
+            <li>担当者会議</li>
+            <li>Google Calendar 同期</li>
+            <li>モニタリング一覧 / 編集 / 削除 UI</li>
+            <li>OpenAPI 正本化</li>
+            <li>自動テスト</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="two-column section">
+        <div class="summary-box">
+          <h2>次に揃えるべき項目</h2>
+          <ol class="check-list">
+            <li>OpenAPI を API 契約の正本にする</li>
+            <li>認証トークンを cookie ベースへ移す</li>
+            <li>Firestore の一覧系を cursor pagination に寄せる</li>
+            <li>文字化けした例外メッセージを修復する</li>
+            <li>自動テストを追加する</li>
+          </ol>
+        </div>
+
+        <div class="summary-box warn">
+          <h2>まず読むべき文書</h2>
+          <ul class="link-list">
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/HANDOVER.md">HANDOVER.md</a></li>
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/HANDOVER_CURRENT.md">HANDOVER_CURRENT.md</a></li>
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/README.md">README.md</a></li>
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/00_PROJECT/PROJECT_GROUND_RULES.md">PROJECT_GROUND_RULES.md</a></li>
+          </ul>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div>Last updated: 2026-03-20</div>
+        <div>正本は <a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/HANDOVER.md">HANDOVER.md</a> です。</div>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>

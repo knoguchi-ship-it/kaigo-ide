@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KaigoIDE Docs | 設計</title>
+  <link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">本文へ移動</a>
+  <div class="site-shell">
+    <nav class="site-nav" aria-label="サイトナビゲーション">
+      <a class="brand" href="../index.html">
+        <span class="brand-mark">KAIGOIDE DOCS</span>
+        <div class="brand-title">KaigoIDE</div>
+        <p class="brand-copy">現行実装と target state 文書の読み分けを整理したページです。</p>
+      </a>
+
+      <div class="nav-group">
+        <div class="nav-label">Pages</div>
+        <div class="nav-list">
+          <a class="nav-link" href="../index.html">ホーム<small>全体導線</small></a>
+          <a class="nav-link" href="../governance/index.html">ガバナンス<small>ルールと手順</small></a>
+          <a class="nav-link" href="../encoding/index.html">文字コード<small>原因と改善策</small></a>
+          <a class="nav-link" href="../handover/index.html">引き継ぎ<small>現在地と次の着手点</small></a>
+          <a class="nav-link" href="./index.html" aria-current="page">設計<small>現行構成と正本導線</small></a>
+          <a class="nav-link" href="../operations/index.html">運用<small>環境と運用注意点</small></a>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">Primary Docs</div>
+        <div class="nav-list">
+          <a class="nav-link" href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/02_DESIGN/SDD.md">正本: SDD</a>
+          <a class="nav-link" href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/01_REQUIREMENTS/PRD.md">要件: PRD</a>
+          <a class="nav-link" href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/HANDOVER.md">現在地: HANDOVER</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="site-main" id="main-content">
+      <header class="page-header">
+        <span class="eyebrow">Architecture</span>
+        <h1>現行実装と目標設計を読み分ける</h1>
+        <p>このページは、どの文書を「現在地の正本」として読むべきか、どの文書を「target state」として読むべきかを整理するための入口です。</p>
+      </header>
+
+      <section class="summary-box">
+        <h2>結論</h2>
+        <p>現行実装の正本は README と HANDOVER です。PRD / SDD は将来像を含むため、そのまま現在地と読まないようにします。</p>
+      </section>
+
+      <section class="layout-grid cards-3 section">
+        <article class="card">
+          <h2>現行アーキテクチャ</h2>
+          <ul class="status-list">
+            <li>Frontend: React + TypeScript + Vite</li>
+            <li>Backend: NestJS</li>
+            <li>Data: Firestore</li>
+            <li>AI: Gemini Developer API / Vertex AI</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>現在地の正本</h2>
+          <ul class="status-list">
+            <li>README.md</li>
+            <li>HANDOVER.md</li>
+            <li>HANDOVER_CURRENT.md</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>目標設計の文書</h2>
+          <ul class="status-list">
+            <li>PRD.md</li>
+            <li>SDD.md</li>
+            <li>今後の OpenAPI 正本</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="two-column section">
+        <div class="summary-box">
+          <h2>読む順序</h2>
+          <ol class="check-list">
+            <li>README で起動と全体像を把握する</li>
+            <li>HANDOVER で現在地と優先課題を確認する</li>
+            <li>PRD / SDD で target state を確認する</li>
+            <li>差分がある場合は HANDOVER を優先する</li>
+          </ol>
+        </div>
+
+        <div class="summary-box warn">
+          <h2>参照先</h2>
+          <ul class="link-list">
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/README.md">README.md</a></li>
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/HANDOVER.md">HANDOVER.md</a></li>
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/01_REQUIREMENTS/PRD.md">PRD.md</a></li>
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/02_DESIGN/SDD.md">SDD.md</a></li>
+          </ul>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div>Last updated: 2026-03-20</div>
+        <div>現行実装の正本は <a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/HANDOVER.md">HANDOVER.md</a> と <a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/README.md">README.md</a> です。</div>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>

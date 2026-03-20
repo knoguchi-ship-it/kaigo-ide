@@ -1,6 +1,6 @@
 import { IsOptional, IsString, IsEnum, IsDateString, IsInt, Min } from 'class-validator';
 import { Type } from 'class-transformer';
-import { CareRecordCategory } from '@prisma/client';
+import { CareRecordCategory } from '../../common/enums';
 
 export class CareRecordQueryDto {
   @IsOptional()

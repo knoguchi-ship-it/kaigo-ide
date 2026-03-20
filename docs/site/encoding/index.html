@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KaigoIDE Docs | 文字コード</title>
+  <link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">本文へ移動</a>
+  <div class="site-shell">
+    <nav class="site-nav" aria-label="サイトナビゲーション">
+      <a class="brand" href="../index.html">
+        <span class="brand-mark">KAIGOIDE DOCS</span>
+        <div class="brand-title">KaigoIDE</div>
+        <p class="brand-copy">文字化けを表示問題と実ファイル破損に分けて理解するためのページです。</p>
+      </a>
+
+      <div class="nav-group">
+        <div class="nav-label">Pages</div>
+        <div class="nav-list">
+          <a class="nav-link" href="../index.html">ホーム<small>全体導線</small></a>
+          <a class="nav-link" href="../governance/index.html">ガバナンス<small>ルールと手順</small></a>
+          <a class="nav-link" href="./index.html" aria-current="page">文字コード<small>原因と改善策</small></a>
+          <a class="nav-link" href="../handover/index.html">引き継ぎ<small>現在地と次の着手点</small></a>
+          <a class="nav-link" href="../architecture/index.html">設計<small>現行構成と正本導線</small></a>
+          <a class="nav-link" href="../operations/index.html">運用<small>環境と運用注意点</small></a>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">Primary Docs</div>
+        <div class="nav-list">
+          <a class="nav-link" href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/00_PROJECT/ENCODING_POLICY.md">正本: 文字コード方針</a>
+          <a class="nav-link" href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/HANDOVER.md">正本: 引き継ぎ書</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="site-main" id="main-content">
+      <header class="page-header">
+        <span class="eyebrow">Encoding</span>
+        <h1>文字化けは 2 種類に分けて扱う</h1>
+        <p>表示だけ壊れているケースと、実ファイル自体が壊れているケースを分離して扱うことが、誤修復を防ぐための基本方針です。</p>
+      </header>
+
+      <section class="summary-box">
+        <h2>結論</h2>
+        <p>このリポジトリの標準文字コードは UTF-8 です。Windows PowerShell 5.1 の表示問題と、実ファイル破損は別問題として扱います。</p>
+      </section>
+
+      <section class="layout-grid cards-2 section">
+        <article class="card">
+          <h2>表示時の文字化け</h2>
+          <p>UTF-8 の正常ファイルでも、Windows PowerShell 5.1 と code page 932 の組み合わせでは文字化けして見えることがあります。</p>
+          <div class="tag-row">
+            <span class="tag warn">表示問題</span>
+            <span class="tag accent">実体は正常な場合がある</span>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>実ファイル内の文字化け</h2>
+          <p>一部の API サービスでは、例外メッセージ文字列そのものが壊れて保存されています。こちらはコード修復が必要です。</p>
+          <div class="tag-row">
+            <span class="tag danger">実データ破損</span>
+            <span class="tag warn">個別修復が必要</span>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">確認済みの原因</h2>
+        <ol class="check-list">
+          <li>UTF-8 ファイルを CP932 前提で読むと文字化けする</li>
+          <li>Windows PowerShell 5.1 は文字コード取り扱いで混乱を起こしやすい</li>
+          <li>これまで `.editorconfig` と `.gitattributes` がなく、リポジトリとして文字コード方針が固定されていなかった</li>
+        </ol>
+      </section>
+
+      <section class="two-column section">
+        <div class="summary-box">
+          <h2>修復順序</h2>
+          <ol class="check-list">
+            <li>文書で方針を固定する</li>
+            <li>`.editorconfig` と `.gitattributes` を追加する</li>
+            <li>壊れた例外メッセージを個別修復する</li>
+          </ol>
+        </div>
+
+        <div class="summary-box danger">
+          <h2>現在の修復対象</h2>
+          <ul class="link-list">
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/services/api/src/monitoring-record/monitoring-record.service.ts">monitoring-record.service.ts</a></li>
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/services/api/src/care-plan/care-plan.service.ts">care-plan.service.ts</a></li>
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/services/api/src/client/client.service.ts">client.service.ts</a></li>
+            <li><a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/services/api/src/care-record/care-record.service.ts">care-record.service.ts</a></li>
+          </ul>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div>Last updated: 2026-03-20</div>
+        <div>正本は <a href="https://github.com/knoguchi-ship-it/kaigo-ide/blob/master/docs/00_PROJECT/ENCODING_POLICY.md">ENCODING_POLICY.md</a> です。</div>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>
