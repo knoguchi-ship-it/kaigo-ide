@@ -141,8 +141,8 @@ GitHub Pages 設定手順書は [docs/00_PROJECT/GITHUB_PAGES_SETUP_RUNBOOK.md](
 6. 文字化けした例外メッセージを修復する
 7. 既存ファイル全体の文字コード / 行末を再確認する
 8. ドキュメントサイトのパンくず / セクション導線を追加する
-9. GitHub Pages の repository 設定で source を `GitHub Actions` に切り替える
-10. GitHub ログイン済みセッションで `Settings > Pages` を開き、Playwright で再確認する
+9. GitHub Pages 公開サイトの `favicon.ico` 404 を解消する
+10. `pages.yml` の Node.js 20 廃止警告に対する更新方針を決める
 
 ## 次担当者チェックリスト
 

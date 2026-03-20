@@ -20,7 +20,7 @@ GitHub Pages 公開計画の正本は [GITHUB_PAGES_PLAN.md](C:/VSCode/CloudePL/
 - 表示系の文字化けと実ファイル破損を区別する方針を追加
 - `.editorconfig` と `.gitattributes` を追加
 - `docs/site/` に接続済みの HTML サイト骨格を追加
-- GitHub Pages は `GitHub Actions` 公開を採用
-- Playwright で確認したが、現時点の公開 URL は `Site not found`
+- repository を `public` 化し、GitHub Pages は `GitHub Actions` 公開で有効化済み
+- Playwright で公開 URL `https://knoguchi-ship-it.github.io/kaigo-ide/` の表示を確認済み
 - `pnpm build` は成功
 - `pnpm test` はテスト未整備のため失敗

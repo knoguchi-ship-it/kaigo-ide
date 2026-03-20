@@ -9,90 +9,128 @@
 
 ## 目的
 
-この手順書は、`docs/site/` を GitHub Pages で公開するために必要な GitHub 側設定と確認手順を定義する。
+この手順書は、`docs/site/` を GitHub Pages で公開するために必要な GitHub 側設定、Playwright による確認結果、残課題を定義する。
 
 ## 結論
 
-2026-03-20 時点で、リポジトリ側の実装は完了している。
+2026-03-20 時点で GitHub Pages の公開は完了している。  
+公開 URL は以下:
 
-完了済み:
-- `master` ブランチへ Pages workflow を push 済み
-- `docs/site/` は Pages 用の静的公開物として整備済み
-- `.nojekyll` と `404.html` を追加済み
+- `https://knoguchi-ship-it.github.io/kaigo-ide/`
 
-未完了:
-- GitHub repository の `Settings > Pages` で `Source = GitHub Actions` を有効化
-- `Actions` の `Pages` workflow 実行確認
-- 公開 URL の最終確認
+現在の到達状態:
+- repository visibility は `public`
+- `Settings > Pages` の `Source` は `GitHub Actions`
+- `Pages` workflow は成功
+- Playwright で公開ホーム `KaigoIDE Docs` の表示を確認済み
 
-## Playwright 確認結果
+未解決:
+- 公開サイトで `favicon.ico` の 404 が 1 件出る
+- `actions/checkout@v4` などに Node.js 20 廃止警告が出る
 
-### 1. 公開 URL
+## Playwright 証跡
+
+### 1. 初回の公開 URL は 404
 
 Playwright で `https://knoguchi-ship-it.github.io/kaigo-ide/` を確認した結果、`Site not found · GitHub Pages` が表示された。
 
 ![GitHub Pages public 404](C:/VSCode/CloudePL/kaigoIDE/docs/site/assets/img/github-pages-public-404.png)
 
 判断:
-- GitHub Pages はまだ配信開始していない
-- もしくは Pages 自体が未有効化
+- GitHub Pages はまだ有効化されていなかった
+- もしくは repository 側の公開条件を満たしていなかった
 
-### 2. Settings > Pages
+### 2. 設定画面では public 化または upgrade が必要だった
 
-Playwright で `https://github.com/knoguchi-ship-it/kaigo-ide/settings/pages` を確認した結果、未ログインまたは非公開アクセス不可のため `404` になった。
+`Settings > Pages` では `Upgrade or make this repository public to enable Pages` と表示された。
 
-![GitHub settings pages 404](C:/VSCode/CloudePL/kaigoIDE/docs/site/assets/img/github-pages-site-not-found.png)
+![GitHub Pages upgrade or public](C:/VSCode/CloudePL/kaigoIDE/docs/site/assets/img/github-pages-upgrade-or-public.png)
 
 判断:
-- GitHub 側設定の実操作には、対象 repository へアクセスできる認証済みセッションが必要
+- 個人運用かつ無料寄りの方針では `public` 化が現実解
+- private repository のままでは Pages を有効化できなかった
 
-## 前提条件
+### 3. repository を public 化した
 
-1. GitHub 上で対象 repository にアクセスできること
-2. repository の管理権限または Pages 設定権限を持っていること
-3. `master` ブランチに最新コミットが反映済みであること
+`Settings > General > Danger Zone` から visibility を `public` に変更した。
+
+![GitHub general danger zone before](C:/VSCode/CloudePL/kaigoIDE/docs/site/assets/img/github-general-danger-zone-before.png)
+![GitHub change visibility dialog](C:/VSCode/CloudePL/kaigoIDE/docs/site/assets/img/github-change-visibility-dialog.png)
+![GitHub general after public](C:/VSCode/CloudePL/kaigoIDE/docs/site/assets/img/github-general-after-public.png)
+
+### 4. Pages の Source を GitHub Actions に切り替えた
+
+public 化後、`Settings > Pages` で `Source` を `Deploy from a branch` から `GitHub Actions` に変更した。
+
+![GitHub Pages settings before enable](C:/VSCode/CloudePL/kaigoIDE/docs/site/assets/img/github-pages-settings-before-enable.png)
+![GitHub Pages settings after GitHub Actions](C:/VSCode/CloudePL/kaigoIDE/docs/site/assets/img/github-pages-settings-after-github-actions.png)
+
+### 5. 失敗済み Pages workflow を再実行して成功させた
+
+切替前に失敗していた `Pages` workflow は、`Source = GitHub Actions` に変更した後に再実行し、`build` と `deploy` の両方が成功した。
+
+![GitHub Pages actions success](C:/VSCode/CloudePL/kaigoIDE/docs/site/assets/img/github-pages-actions-success.png)
+
+原因:
+- 失敗時点では `actions/configure-pages` が Pages site を取得できなかった
+- source 切替後の再実行で解消した
+
+### 6. 公開 URL の表示を確認した
+
+Playwright で公開 URL を開き、タイトル `KaigoIDE Docs` とホーム画面の表示を確認した。
+
+![GitHub Pages live home](C:/VSCode/CloudePL/kaigoIDE/docs/site/assets/img/github-pages-live-home.png)
+
+補足:
+- ブラウザ console には `favicon.ico` の 404 が 1 件出ている
+- 本文・ナビゲーション・各ページリンクは表示できている
 
 ## 実施手順
 
-### Step 1. GitHub にログインする
+### Step 1. repository を public にする
 
-1. GitHub にブラウザでログインする
-2. `https://github.com/knoguchi-ship-it/kaigo-ide` が開けることを確認する
+1. `Settings > General` を開く
+2. `Danger Zone` の visibility 変更を開く
+3. `Change to public` を選ぶ
+4. 確認ダイアログを完了して public にする
 
 期待結果:
-- repository のトップページが見える
+- `This repository is currently public.` が表示される
 
-### Step 2. Pages 設定を開く
+### Step 2. `Settings > Pages` を開く
 
 1. `Settings` を開く
 2. 左ナビの `Pages` を開く
 
-直接 URL:
+URL:
 - `https://github.com/knoguchi-ship-it/kaigo-ide/settings/pages`
 
 期待結果:
 - `Build and deployment` セクションが表示される
 
-### Step 3. Source を GitHub Actions にする
+### Step 3. `Source` を `GitHub Actions` にする
 
-1. `Source` を確認する
+1. `Source` を開く
 2. `GitHub Actions` を選択する
-3. 保存する
 
 期待結果:
-- Pages が Actions workflow を公開元として認識する
+- `GitHub Pages source saved.` が表示される
+- workflow テンプレート候補が表示される
 
-### Step 4. Actions を確認する
+### Step 4. `Pages` workflow を成功させる
 
 1. `Actions` タブを開く
-2. `Pages` workflow が起動していることを確認する
-3. `build` と `deploy` が成功していることを確認する
+2. `Pages` workflow を開く
+3. 既存の失敗 run がある場合は `Re-run failed jobs` を実行する
+4. `build` と `deploy` が success になることを確認する
 
 workflow ファイル:
 - [pages.yml](C:/VSCode/CloudePL/kaigoIDE/.github/workflows/pages.yml)
 
 期待結果:
-- `Deploy to GitHub Pages` が success になる
+- `Status: Success`
+- `build` success
+- `deploy` success
 
 ### Step 5. 公開 URL を確認する
 
@@ -101,30 +139,44 @@ workflow ファイル:
 3. `governance` / `encoding` / `handover` / `architecture` / `operations` に遷移できることを確認する
 
 期待結果:
-- `Site not found` が消える
+- `Site not found` が出ない
 - `docs/site/index.html` 相当のホームが表示される
 
-## トラブルシュート
+## 現在の残課題
 
-### 症状 1. 公開 URL が 404 のまま
+### 残課題 1. `favicon.ico` の 404
 
-確認項目:
-1. `Settings > Pages` で `Source = GitHub Actions` になっているか
-2. `Actions > Pages` workflow が成功しているか
-3. repository が正しい owner / repo 名で公開 URL に対応しているか
+現象:
+- 公開ホーム表示時に `favicon.ico` の取得で 404 が 1 件出る
 
-### 症状 2. repository 自体が 404
+影響:
+- 本文表示には影響しない
+- console がきれいではない
 
-確認項目:
-1. GitHub にログインしているか
-2. repository が private の場合、対象アカウントにアクセス権があるか
-3. owner 名と repo 名が正しいか
+次対応:
+- `docs/site/favicon.ico` か `docs/site/assets/` 配下の favicon を追加し、`<link rel="icon">` を各 HTML に入れる
 
-### 症状 3. workflow が見えない
+### 残課題 2. GitHub Actions の Node.js 20 廃止警告
 
-確認項目:
-1. `master` に `pages.yml` が push 済みか
-2. `Actions` が repository で無効化されていないか
+現象:
+- `actions/checkout@v4`
+- `actions/configure-pages@v5`
+- `actions/upload-pages-artifact@v3`
+- `actions/deploy-pages@v4`
+
+上記 action に対して Node.js 20 廃止警告が出ている。
+
+次対応:
+- GitHub の公式リリースと changelog を確認し、Node.js 24 前提の最新版へ上げられるかを調査する
+- 互換性が確認できたら `pages.yml` を更新する
+
+## 確認チェックリスト
+
+- repository は public
+- `Settings > Pages` の `Source` は `GitHub Actions`
+- `Actions > Pages` が success
+- 公開 URL で `KaigoIDE Docs` が表示される
+- 公開サイトの主要ページに遷移できる
 
 ## 参照
 
@@ -134,3 +186,5 @@ workflow ファイル:
   https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site
 - GitHub Docs: Creating a custom 404 page for your GitHub Pages site  
   https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-custom-404-page-for-your-github-pages-site
+- GitHub Blog: Deprecation of Node 20 on GitHub Actions runners  
+  https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

@@ -122,6 +122,7 @@ curl -X POST http://localhost:4000/api/auth/dev-login \
 - ドキュメントサイト計画: [docs/00_PROJECT/DOCUMENT_SITE_PLAN.md](docs/00_PROJECT/DOCUMENT_SITE_PLAN.md)
 - GitHub Pages 公開計画: [docs/00_PROJECT/GITHUB_PAGES_PLAN.md](docs/00_PROJECT/GITHUB_PAGES_PLAN.md)
 - GitHub Pages 設定手順書: [docs/00_PROJECT/GITHUB_PAGES_SETUP_RUNBOOK.md](docs/00_PROJECT/GITHUB_PAGES_SETUP_RUNBOOK.md)
+- GitHub Pages 公開 URL: <https://knoguchi-ship-it.github.io/kaigo-ide/>
 - ドキュメントサイト入口: [docs/site/index.html](docs/site/index.html)
 - 引き継ぎページ: [docs/site/handover/index.html](docs/site/handover/index.html)
 - 要件書: [docs/01_REQUIREMENTS/PRD.md](docs/01_REQUIREMENTS/PRD.md)
