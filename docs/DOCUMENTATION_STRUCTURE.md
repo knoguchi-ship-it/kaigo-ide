@@ -9,6 +9,7 @@ docs/
 │   ├── ENCODING_POLICY.md           # 文字コード方針
 │   ├── DOCUMENT_SITE_PLAN.md        # ドキュメントサイト計画
 │   ├── GITHUB_PAGES_PLAN.md         # GitHub Pages 公開計画
+│   ├── GITHUB_PAGES_SETUP_RUNBOOK.md # GitHub Pages 設定手順書
 │   ├── SOW.md                       # Statement of Work（作業範囲記述書）
 │   ├── PROJECT_CHARTER.md           # プロジェクト憲章
 │   └── STAKEHOLDERS.md              # ステークホルダー一覧

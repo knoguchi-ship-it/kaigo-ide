@@ -9,6 +9,7 @@
 文字コード方針の正本は [docs/00_PROJECT/ENCODING_POLICY.md](C:/VSCode/CloudePL/kaigoIDE/docs/00_PROJECT/ENCODING_POLICY.md) です。
 ドキュメントサイト計画の正本は [docs/00_PROJECT/DOCUMENT_SITE_PLAN.md](C:/VSCode/CloudePL/kaigoIDE/docs/00_PROJECT/DOCUMENT_SITE_PLAN.md) です。
 GitHub Pages 公開計画の正本は [docs/00_PROJECT/GITHUB_PAGES_PLAN.md](C:/VSCode/CloudePL/kaigoIDE/docs/00_PROJECT/GITHUB_PAGES_PLAN.md) です。
+GitHub Pages 設定手順書は [docs/00_PROJECT/GITHUB_PAGES_SETUP_RUNBOOK.md](C:/VSCode/CloudePL/kaigoIDE/docs/00_PROJECT/GITHUB_PAGES_SETUP_RUNBOOK.md) です。
 
 次の担当者は着手前に必ず確認してください。
 
@@ -109,16 +110,19 @@ GitHub Pages 公開計画の正本は [docs/00_PROJECT/GITHUB_PAGES_PLAN.md](C:/
 
 1. [docs/00_PROJECT/DOCUMENT_SITE_PLAN.md](C:/VSCode/CloudePL/kaigoIDE/docs/00_PROJECT/DOCUMENT_SITE_PLAN.md)
 2. [docs/00_PROJECT/GITHUB_PAGES_PLAN.md](C:/VSCode/CloudePL/kaigoIDE/docs/00_PROJECT/GITHUB_PAGES_PLAN.md)
-3. [docs/site/index.html](C:/VSCode/CloudePL/kaigoIDE/docs/site/index.html)
-4. [docs/site/governance/index.html](C:/VSCode/CloudePL/kaigoIDE/docs/site/governance/index.html)
-5. [docs/site/encoding/index.html](C:/VSCode/CloudePL/kaigoIDE/docs/site/encoding/index.html)
-6. [docs/site/handover/index.html](C:/VSCode/CloudePL/kaigoIDE/docs/site/handover/index.html)
-7. [docs/site/architecture/index.html](C:/VSCode/CloudePL/kaigoIDE/docs/site/architecture/index.html)
-8. [docs/site/operations/index.html](C:/VSCode/CloudePL/kaigoIDE/docs/site/operations/index.html)
-9. [docs/site/assets/css/site.css](C:/VSCode/CloudePL/kaigoIDE/docs/site/assets/css/site.css)
-10. [.editorconfig](C:/VSCode/CloudePL/kaigoIDE/.editorconfig)
-11. [.gitattributes](C:/VSCode/CloudePL/kaigoIDE/.gitattributes)
-12. [.github/workflows/pages.yml](C:/VSCode/CloudePL/kaigoIDE/.github/workflows/pages.yml)
+3. [docs/00_PROJECT/GITHUB_PAGES_SETUP_RUNBOOK.md](C:/VSCode/CloudePL/kaigoIDE/docs/00_PROJECT/GITHUB_PAGES_SETUP_RUNBOOK.md)
+4. [docs/site/index.html](C:/VSCode/CloudePL/kaigoIDE/docs/site/index.html)
+5. [docs/site/governance/index.html](C:/VSCode/CloudePL/kaigoIDE/docs/site/governance/index.html)
+6. [docs/site/encoding/index.html](C:/VSCode/CloudePL/kaigoIDE/docs/site/encoding/index.html)
+7. [docs/site/handover/index.html](C:/VSCode/CloudePL/kaigoIDE/docs/site/handover/index.html)
+8. [docs/site/architecture/index.html](C:/VSCode/CloudePL/kaigoIDE/docs/site/architecture/index.html)
+9. [docs/site/operations/index.html](C:/VSCode/CloudePL/kaigoIDE/docs/site/operations/index.html)
+10. [docs/site/assets/css/site.css](C:/VSCode/CloudePL/kaigoIDE/docs/site/assets/css/site.css)
+11. [docs/site/assets/img/github-pages-public-404.png](C:/VSCode/CloudePL/kaigoIDE/docs/site/assets/img/github-pages-public-404.png)
+12. [docs/site/assets/img/github-pages-site-not-found.png](C:/VSCode/CloudePL/kaigoIDE/docs/site/assets/img/github-pages-site-not-found.png)
+13. [.editorconfig](C:/VSCode/CloudePL/kaigoIDE/.editorconfig)
+14. [.gitattributes](C:/VSCode/CloudePL/kaigoIDE/.gitattributes)
+15. [.github/workflows/pages.yml](C:/VSCode/CloudePL/kaigoIDE/.github/workflows/pages.yml)
 
 ## 文字コード状況
 
@@ -138,6 +142,7 @@ GitHub Pages 公開計画の正本は [docs/00_PROJECT/GITHUB_PAGES_PLAN.md](C:/
 7. 既存ファイル全体の文字コード / 行末を再確認する
 8. ドキュメントサイトのパンくず / セクション導線を追加する
 9. GitHub Pages の repository 設定で source を `GitHub Actions` に切り替える
+10. GitHub ログイン済みセッションで `Settings > Pages` を開き、Playwright で再確認する
 
 ## 次担当者チェックリスト
 

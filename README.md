@@ -121,6 +121,7 @@ curl -X POST http://localhost:4000/api/auth/dev-login \
 - 文字コード方針: [docs/00_PROJECT/ENCODING_POLICY.md](docs/00_PROJECT/ENCODING_POLICY.md)
 - ドキュメントサイト計画: [docs/00_PROJECT/DOCUMENT_SITE_PLAN.md](docs/00_PROJECT/DOCUMENT_SITE_PLAN.md)
 - GitHub Pages 公開計画: [docs/00_PROJECT/GITHUB_PAGES_PLAN.md](docs/00_PROJECT/GITHUB_PAGES_PLAN.md)
+- GitHub Pages 設定手順書: [docs/00_PROJECT/GITHUB_PAGES_SETUP_RUNBOOK.md](docs/00_PROJECT/GITHUB_PAGES_SETUP_RUNBOOK.md)
 - ドキュメントサイト入口: [docs/site/index.html](docs/site/index.html)
 - 引き継ぎページ: [docs/site/handover/index.html](docs/site/handover/index.html)
 - 要件書: [docs/01_REQUIREMENTS/PRD.md](docs/01_REQUIREMENTS/PRD.md)
