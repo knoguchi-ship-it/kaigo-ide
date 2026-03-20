@@ -141,8 +141,8 @@ GitHub Pages 設定手順書は [docs/00_PROJECT/GITHUB_PAGES_SETUP_RUNBOOK.md](
 6. 文字化けした例外メッセージを修復する
 7. 既存ファイル全体の文字コード / 行末を再確認する
 8. ドキュメントサイトのパンくず / セクション導線を追加する
-9. GitHub Pages 用の `favicon.svg` を追加し、全 HTML に `rel="icon"` を入れる
-10. `pages.yml` を Node 24 opt-in と action のフル SHA pin に更新する
+9. GitHub Pages 公開サイトのアクセシビリティ点検を行う
+10. 運用ページの情報粒度を整理し、production 運用手順を厚くする
 
 ## 次担当者チェックリスト
 
