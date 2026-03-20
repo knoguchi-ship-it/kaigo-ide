@@ -10,6 +10,7 @@
 ドキュメントサイト計画の正本は [docs/00_PROJECT/DOCUMENT_SITE_PLAN.md](C:/VSCode/CloudePL/kaigoIDE/docs/00_PROJECT/DOCUMENT_SITE_PLAN.md) です。
 GitHub Pages 公開計画の正本は [docs/00_PROJECT/GITHUB_PAGES_PLAN.md](C:/VSCode/CloudePL/kaigoIDE/docs/00_PROJECT/GITHUB_PAGES_PLAN.md) です。
 GitHub Pages 設定手順書は [docs/00_PROJECT/GITHUB_PAGES_SETUP_RUNBOOK.md](C:/VSCode/CloudePL/kaigoIDE/docs/00_PROJECT/GITHUB_PAGES_SETUP_RUNBOOK.md) です。
+最新セッションの引き継ぎメモは [docs/00_PROJECT/SESSION_HANDOVER_2026-03-20.md](C:/VSCode/CloudePL/kaigoIDE/docs/00_PROJECT/SESSION_HANDOVER_2026-03-20.md) です。
 
 次の担当者は着手前に必ず確認してください。
 
@@ -39,6 +40,9 @@ GitHub Pages 設定手順書は [docs/00_PROJECT/GITHUB_PAGES_SETUP_RUNBOOK.md](
 - AI 方針:
   - 開発 / 個人運用 / 匿名化データ: `Gemini Developer API`
   - 本番 / 実データ / センシティブ情報: `Vertex AI`
+- GitHub Pages は公開済みです
+- 現在の worktree は dirty のままです
+- dirty 状態には、今回作業以外の未整理変更が含まれます
 
 ## 読み方
 

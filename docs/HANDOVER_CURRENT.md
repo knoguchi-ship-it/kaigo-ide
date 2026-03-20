@@ -6,6 +6,7 @@
 文字コード方針の正本は [ENCODING_POLICY.md](C:/VSCode/CloudePL/kaigoIDE/docs/00_PROJECT/ENCODING_POLICY.md) です。
 ドキュメントサイト計画の正本は [DOCUMENT_SITE_PLAN.md](C:/VSCode/CloudePL/kaigoIDE/docs/00_PROJECT/DOCUMENT_SITE_PLAN.md) です。
 GitHub Pages 公開計画の正本は [GITHUB_PAGES_PLAN.md](C:/VSCode/CloudePL/kaigoIDE/docs/00_PROJECT/GITHUB_PAGES_PLAN.md) です。
+最新セッションの引き継ぎメモは [SESSION_HANDOVER_2026-03-20.md](C:/VSCode/CloudePL/kaigoIDE/docs/00_PROJECT/SESSION_HANDOVER_2026-03-20.md) です。
 
 ## 2026-03-20 時点
 
@@ -23,5 +24,6 @@ GitHub Pages 公開計画の正本は [GITHUB_PAGES_PLAN.md](C:/VSCode/CloudePL/
 - repository を `public` 化し、GitHub Pages は `GitHub Actions` 公開で有効化済み
 - Playwright で公開 URL `https://knoguchi-ship-it.github.io/kaigo-ide/` の表示を確認済み
 - `favicon` 追加と `pages.yml` の Node 24 / SHA pin 対応は完了
+- worktree は dirty のまま。未整理変更を勝手に戻さないこと
 - `pnpm build` は成功
 - `pnpm test` はテスト未整備のため失敗
