@@ -154,7 +154,9 @@ workflow ファイル:
 - console がきれいではない
 
 次対応:
-- `docs/site/favicon.ico` か `docs/site/assets/` 配下の favicon を追加し、`<link rel="icon">` を各 HTML に入れる
+- `docs/site/favicon.svg` を追加する
+- 各 HTML の `<head>` に `rel="icon"` を入れる
+- 相対パスで Pages 配下から確実に解決できるようにする
 
 ### 残課題 2. GitHub Actions の Node.js 20 廃止警告
 
@@ -167,8 +169,9 @@ workflow ファイル:
 上記 action に対して Node.js 20 廃止警告が出ている。
 
 次対応:
-- GitHub の公式リリースと changelog を確認し、Node.js 24 前提の最新版へ上げられるかを調査する
-- 互換性が確認できたら `pages.yml` を更新する
+- `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true` を `pages.yml` に設定する
+- `actions/checkout` は Node 24 対応の `v5` 系へ上げる
+- `configure-pages` / `upload-pages-artifact` / `deploy-pages` は公式 tag のフル SHA pin に寄せる
 
 ## 確認チェックリスト
 
